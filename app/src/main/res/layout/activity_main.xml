@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/pulse_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pulse"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/btnPause"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/stop"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/temperature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/temperature"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/heat_start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/heat_btn_start"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/heat_stop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/heat_btn_stop"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/damper_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/damper_text"
+        android:textSize="30sp" />
+
+    <SeekBar
+        android:id="@+id/damperBar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginLeft="30dp"
+        android:minHeight="55dp"
+        android:paddingLeft="20sp"
+        android:paddingRight="5sp" />
+
+</LinearLayout>

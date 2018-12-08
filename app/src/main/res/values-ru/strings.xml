@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Пульт</string>
+    <string name="pulse">Пульс</string>
+    <string name="start">Старт</string>
+    <string name="heat_start">Нагрев начался</string>
+    <string name="heat_stop">Нагрев закончился</string>
+    <string name="heat">Нагрев</string>
+    <string name="stop">Стоп</string>
+    <string name="temperature">Температура</string>
+    <string name="heat_btn_start">Начать нагрев</string>
+    <string name="heat_btn_stop">Закончить нагрев</string>
+    <string name="wait">Подождите...</string>
+    <string name="damper_text">Заслонка</string>
+</resources>

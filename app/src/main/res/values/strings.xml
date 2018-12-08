@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">gear</string>
+    <string name="pulse">Pulse</string>
+    <string name="heat">Heating</string>
+    <string name="heat_start">Heating start</string>
+    <string name="heat_stop">Heating stop</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="temperature">Temperature</string>
+    <string name="heat_btn_start">Heating start</string>
+    <string name="heat_btn_stop">Heating stop</string>
+    <string name="wait">Please wait...</string>
+    <string name="damper_text">Damper</string>
+</resources>

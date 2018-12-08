@@ -1,0 +1,143 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using UnityEngine;
+
+public class UDPController : MonoBehaviour
+{
+    #region Data
+    public DatagramController DatagramController;
+    public ValueInfo TemperatureValue;
+    [Space(10)]
+
+    public int points = 0;
+
+    public string serverIp = "127.0.0.1";
+    public int serverPort = 10101;
+
+    public List<object> DataContainer { get; private set; }
+    List<IPEndPoint> clientList = new List<IPEndPoint>();
+
+    UDPServer connection;
+
+    // потом перенести
+    DateTime? LastTimePoint = null;
+    double? lastV = null;
+    double spirogram = 0;
+
+    private static UDPController instance = null;
+    public static UDPController Instance { get { return instance; } }
+    #endregion
+
+    #region Unity Events
+    private void Awake()
+    {
+        instance = this;
+        DataContainer = new List<object>();
+        connection = new UDPServer(serverIp, serverPort);
+    }
+
+    private void Start()
+    {
+        GlobalEventManager.Instance.AddEventListener(GlobalEventType.NewFlapValues, OnEvent);
+    }
+
+    private void OnEvent(GlobalEventType eventType, Component component, object param)
+    {
+        switch (eventType)
+        {
+            case GlobalEventType.NewFlapValues:
+                var data = (param as FlapSetting).ConvertToBytes();
+                SendAll(data);
+                break;
+        }
+    }
+
+    public void AddClient(IPEndPoint ipEndpoint)
+    {
+        if (clientList.Contains(ipEndpoint) == false)
+        {
+            clientList.Add(ipEndpoint);
+        }
+    }
+
+    private void RemoveClient(IPEndPoint ipEndpoint)
+    {
+        clientList.Remove(ipEndpoint);
+    }
+
+    private void OnApplicationQuit()
+    {
+        connection.Close();
+    }
+    #endregion
+
+    #region API
+    public void SendTest()
+    {
+        var data = new byte[] { 0x01, 0x64 };
+        SendAll(data);
+    }
+
+
+    public void SendById(byte[] data, int clientId)
+    {
+        connection.Send(data, clientList[clientId]);
+    }
+
+    public void SendAll(byte[] data)
+    {
+        foreach (var ip in clientList)
+        {
+            connection.Send(data, ip);
+        }
+    }
+
+    public void ReceiptData(byte[] data)
+    {
+        var myDelegate = new Action<object>(delegate (object param) { ReceiptDataToMainThread(param as byte[]); });
+        UnityThread.executeInUpdate(myDelegate, data);
+    }
+
+    public void ReceiptDataToMainThread(byte[] data)
+    {
+        var rangeMode = 500;
+        var chunkCount = 3;
+        var totalLength = data.Length;
+        var chunkLength = totalLength / chunkCount;
+        var dataArr = Enumerable.Range(0, chunkCount).
+            Select(i => data.Skip(i * chunkLength).Take(chunkLength).ToArray()).ToArray();
+
+        var temp_arz = (((dataArr[0][0] & 0xFF) * 256) + (dataArr[0][1] & 0xC0)) / 64;
+        if (temp_arz > 511) { temp_arz -= 1024; }
+        var cTemp = temp_arz * 0.25f;
+
+        var raw = BitConverter.ToUInt16(dataArr[1].Reverse().ToArray(), 0);
+
+        var rd_pressure = (Math.Round(((raw - 1024.0f) * rangeMode * 2.0f) / 60000.0f) - rangeMode);
+
+        var rd_pressure_V = ((0.0182f * Math.Pow(rd_pressure, 2)) + (0.0261f * rd_pressure) - 0.2241f);
+
+        if (rd_pressure < 0) { rd_pressure_V = -rd_pressure_V; }
+        if (!LastTimePoint.HasValue) { LastTimePoint = DateTime.Now; }
+        if (!lastV.HasValue) lastV = rd_pressure_V;
+
+        var dV = rd_pressure_V - lastV;
+        var dt = DateTime.Now - LastTimePoint;
+        LastTimePoint = DateTime.Now;
+        
+        Debug.Log("V_sum " + dV + " : dt " + dt);
+
+        var tmp_spirogram = dV.Value * (dt.Value.Milliseconds / 1000.0);
+        spirogram += tmp_spirogram;
+
+        var raw_t = BitConverter.ToUInt16(dataArr[2].Reverse().ToArray(), 0);
+        var temp = Math.Round((raw_t - 10214.0f) / 37.39f);
+
+        TemperatureValue.UpdateValue((short)cTemp);
+        DatagramController.AddData(new short[] { (short)(rd_pressure_V), (short)(spirogram / 10.0) });
+    }
+    #endregion
+}
