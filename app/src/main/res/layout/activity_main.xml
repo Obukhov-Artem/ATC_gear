@@ -33,11 +33,12 @@
         android:textSize="30sp" />
 
     <TextView
-        android:id="@+id/temperature"
+        android:id="@+id/imitator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/temperature"
-        android:textSize="30sp" />
+        android:text="imitator"
+        android:textSize="30sp"
+        />
 
     <Button
         android:id="@+id/heat_start"
@@ -68,5 +69,13 @@
         android:minHeight="55dp"
         android:paddingLeft="20sp"
         android:paddingRight="5sp" />
+
+    <TextView
+        android:id="@+id/temperature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/temperature"
+        android:textSize="30sp"
+        android:visibility="invisible" />
 
 </LinearLayout>

@@ -10,9 +10,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -20,12 +22,18 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.IOException;
+
+import static java.lang.Thread.sleep;
 
 public class MainActivity extends AppCompatActivity   implements SensorEventListener {
 
-    private  TextView pulse;
-    private  TextView damp_text;
-    private  TextView temp;
+    private  TextView pulseView;
+    private  TextView dampView;
+    private  TextView tempView;
+    private  TextView imitatorView;
 
     private static final String LOG_TAG = "MyHeart";
     private Drawable imgStart;
@@ -33,22 +41,32 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
     private Sensor mHeartRateSensor;
     private String pulse_string;
     private String damp_string;
+    private String imitator_string;
+
+    private int temperature;
+    private int pressure;
+    private int inner_temp;
+    int mHeartRate;
 
     private Button btnStart;
     private Button btnPause;
     private Button heatStart;
     private Button heatPause;
     private SeekBar damper;
+    private UDPHelper udp;
+    private byte[] control_imitator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         pulse_string = getResources().getString(R.string.pulse);
+        control_imitator = new byte[] {0,0};
         damp_string = getResources().getString(R.string.damper_text);
-        pulse = (TextView)findViewById(R.id.pulse_value);
-        temp = (TextView)findViewById(R.id.temperature);
-        damp_text = (TextView)findViewById(R.id.damper_text);
+        pulseView = (TextView)findViewById(R.id.pulse_value);
+        tempView = (TextView)findViewById(R.id.temperature);
+        dampView = (TextView)findViewById(R.id.damper_text);
+        imitatorView = (TextView)findViewById(R.id.imitator);
         Log.d(LOG_TAG, "start app");
         btnStart = (Button) findViewById(R.id.btnStart);
         btnPause = (Button) findViewById(R.id.btnPause);
@@ -59,18 +77,18 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
         btnStart.setVisibility(Button.VISIBLE);
         heatStart.setVisibility(Button.VISIBLE);
         heatPause.setVisibility(Button.GONE);
-        DisplayMetrics dm = getResources().getDisplayMetrics();
         //Log.d("Display",Integer.toString(dm.widthPixels));
-       // Log.d("Display",Integer.toString(dm.heightPixels));
-       // Log.d("Display",Integer.toString(dm.densityDpi));
+        // Log.d("Display",Integer.toString(dm.heightPixels));
+        // Log.d("Display",Integer.toString(dm.densityDpi));
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 btnPause.setVisibility(Button.VISIBLE);
                 btnStart.setVisibility(Button.GONE);
-                pulse.setText(R.string.wait);
+                pulseView.setText(R.string.wait);
                 startMeasure();
+                startSend();
             }
         });
 
@@ -79,8 +97,9 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
             public void onClick(View v) {
                 btnPause.setVisibility(Button.GONE);
                 btnStart.setVisibility(Button.VISIBLE);
-                pulse.setText(pulse_string+": --");
+                pulseView.setText(pulse_string+": --");
                 stopMeasure();
+                startSend();
             }
         });
 
@@ -89,7 +108,14 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
             public void onClick(View v) {
                 heatPause.setVisibility(Button.VISIBLE);
                 heatStart.setVisibility(Button.GONE);
-                temp.setText(R.string.heat_start);
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        R.string.heat_start,
+                        Toast.LENGTH_SHORT);
+                toast.show();
+                control_imitator[0]=1;
+                startSend();
+
+
             }
         });
 
@@ -98,14 +124,22 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
             public void onClick(View v) {
                 heatPause.setVisibility(Button.GONE);
                 heatStart.setVisibility(Button.VISIBLE);
-                temp.setText(R.string.heat_stop);
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        R.string.heat_stop,
+                        Toast.LENGTH_SHORT);
+                toast.show();
+                control_imitator[0]=0;
+                startSend();
             }
         });
 
         damper.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                damp_text.setText(damp_string+ String.format("( %d /100) ",i));
+                dampView.setText(damp_string+ String.format("( %d /100) ",i));
+
+                control_imitator[1]=(byte)i;
+                startSend();
             }
 
             @Override
@@ -119,8 +153,107 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
             }
         });
 
+
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+        Thread udpConnect = new Thread(new Runnable() {
+
+            boolean running;
+            @Override
+            public void run() {
+                try {
+                    udp = new UDPHelper(getApplicationContext(), new UDPHelper.BroadcastListener() {
+                        @Override
+                        public void onReceive(float temp_value, float pressure_value, float inner_temp_value) {
+                            temperature = Math.round(temp_value);
+                            pressure =  Math.round(pressure_value);
+                            inner_temp =  Math.round(inner_temp_value);
+                            imitator_string = String.format(getResources().getString(R.string.imitator), temperature, pressure, inner_temp);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    imitatorView.setText(imitator_string);
+                                }
+                            });
+
+
+                        }
+                    });
+                    udp.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            public void end() {
+                udp.end();
+            }
+        });
+
+        udpConnect.start();
+
+    }
+
+    private void startSend()
+    {
+        Thread udpConnect2 = new Thread(new Runnable() {
+
+            @Override
+            public void run()
+            {
+
+                try {
+                    udp.send(control_imitator);
+                    Log.v("UDP_out", String.valueOf(control_imitator[0])+"    "+String.valueOf(control_imitator[1]));
+                    sleep(100);
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            public void end()
+            {
+                // running = false;
+                udp.end();
+            }
+        });
+
+        udpConnect2.start();
+
+
+
+
+    }
+    private void startSendPulse()
+    {
+        Thread udpConnect3 = new Thread(new Runnable() {
+
+            @Override
+            public void run()
+            {
+
+                try {
+
+                    byte[] pulse_byte =  new byte[] {(byte)mHeartRate};
+                    udp.send_pulse(pulse_byte);
+                    Log.v("pulse_out", String.valueOf(pulse_byte[0]));
+                    sleep(100);
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            public void end()
+            {
+                // running = false;
+                udp.end();
+            }
+        });
+
+        udpConnect3.start();
+
+
 
 
     }
@@ -155,9 +288,11 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
     public void onSensorChanged(SensorEvent sensorEvent) {
         float mHeartRateFloat = sensorEvent.values[0];
 
-        int mHeartRate = Math.round(mHeartRateFloat);
+        mHeartRate = Math.round(mHeartRateFloat);
 
-        pulse.setText(pulse_string+": " + String.format("%d",mHeartRate));
+        pulseView.setText(pulse_string+": " + String.format("%d",mHeartRate));
+
+        startSendPulse();
 
     }
 

@@ -11,4 +11,5 @@
     <string name="heat_btn_stop">Heating stop</string>
     <string name="wait">Please wait...</string>
     <string name="damper_text">Damper</string>
+    <string name="imitator">Temperature = %1$d Pressure = %2$d Inner temp. = %3$d</string>
 </resources>
