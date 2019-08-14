@@ -17,14 +17,19 @@ public class UDPHelper extends Thread {
 
     private BroadcastListener listener;
     private Context ctx;
+    private  DatagramSocket clientSocket;
     private DatagramSocket socket;
     private static final int PORT_IM_IN = 3022;
     private static final int PORT_PC_IN = 3021;
-    private static final int PORT_IM_OUT = 3021;
+    private static final int PORT_IM_OUT = 3023;//??? проверить получаем ли данные с имитатора
+    private static final int PORT_MY2 = 3024;
 
     public UDPHelper(Context ctx, BroadcastListener listener) throws IOException {
         this.listener = listener;
         this.ctx = ctx;
+        clientSocket = new DatagramSocket(PORT_MY2);
+        clientSocket.setBroadcast(true);
+
     }
 
     private float temperature;
@@ -43,15 +48,13 @@ public class UDPHelper extends Thread {
         }
         */
     public void send(byte[] sendData) throws IOException {
-        DatagramSocket clientSocket = new DatagramSocket();
-        clientSocket.setBroadcast(true);
+
         DatagramPacket sendPacket = new DatagramPacket(
                 sendData, sendData.length, getBroadcastAddress(), PORT_IM_IN);
         clientSocket.send(sendPacket);
     }
     public void send_pulse(byte[] sendData) throws IOException {
-        DatagramSocket clientSocket = new DatagramSocket();
-        clientSocket.setBroadcast(true);
+
         DatagramPacket sendPacket = new DatagramPacket(
                 sendData, sendData.length, getBroadcastAddress(), PORT_PC_IN);
         clientSocket.send(sendPacket);
