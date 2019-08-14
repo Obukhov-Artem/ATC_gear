@@ -19,7 +19,7 @@ public class UDPHelper extends Thread {
     private Context ctx;
     private DatagramSocket socket;
     private static final int PORT_IM_IN = 3022;
-    private static final int PORT_PC_IN = 5050;
+    private static final int PORT_PC_IN = 3021;
     private static final int PORT_IM_OUT = 3021;
 
     public UDPHelper(Context ctx, BroadcastListener listener) throws IOException {

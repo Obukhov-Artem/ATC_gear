@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
     private SeekBar damper;
     private UDPHelper udp;
     private byte[] control_imitator;
+    private Thread udpConnect3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +90,8 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
                 pulseView.setText(R.string.wait);
                 startMeasure();
                 startSend();
+
+                startSendPulse();
             }
         });
 
@@ -227,21 +230,21 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
     }
     private void startSendPulse()
     {
-        Thread udpConnect3 = new Thread(new Runnable() {
+          udpConnect3 = new Thread(new Runnable() {
 
             @Override
             public void run()
             {
+                while (true) {
+                    try {
 
-                try {
-
-                    byte[] pulse_byte =  new byte[] {(byte)mHeartRate};
-                    udp.send_pulse(pulse_byte);
-                    Log.v("pulse_out", String.valueOf(pulse_byte[0]));
-                    sleep(100);
-                } catch (Exception e)
-                {
-                    e.printStackTrace();
+                        byte[] pulse_byte = new byte[]{(byte) mHeartRate};
+                        udp.send_pulse(pulse_byte);
+                        Log.v("pulse_out", String.valueOf(pulse_byte[0]));
+                        sleep(100);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             public void end()
@@ -292,7 +295,6 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
 
         pulseView.setText(pulse_string+": " + String.format("%d",mHeartRate));
 
-        startSendPulse();
 
     }
 
