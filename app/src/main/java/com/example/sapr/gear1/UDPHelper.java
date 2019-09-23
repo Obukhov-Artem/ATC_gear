@@ -3,6 +3,7 @@ package com.example.sapr.gear1;
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
+import android.os.Debug;
 import android.util.Log;
 
 import java.io.IOException;
@@ -20,9 +21,10 @@ public class UDPHelper extends Thread {
     private  DatagramSocket clientSocket;
     private DatagramSocket socket;
     private static final int PORT_IM_IN = 3022;
-    private static final int PORT_PC_IN = 3021;
-    private static final int PORT_IM_OUT = 3023;//??? проверить получаем ли данные с имитатора
-    private static final int PORT_MY2 = 3024;
+    private static final int PORT_PC_IN = 3041;
+    private static final int PORT_IM_OUT = 3021;//??? проверить получаем ли данные с имитатора
+    private static final int PORT_MY1 = 3024;
+    private static final int PORT_MY2 = 3025;
 
     public UDPHelper(Context ctx, BroadcastListener listener) throws IOException {
         this.listener = listener;
@@ -116,7 +118,7 @@ public class UDPHelper extends Thread {
 
     InetAddress getBroadcastAddress() throws IOException {
         WifiManager wifi = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
-        DhcpInfo dhcp = wifi.getDhcpInfo();
+        DhcpInfo dhcp = wifi.getDhcpInfo(); 
         if(dhcp == null)
             return InetAddress.getByName("255.255.255.255");
         int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;

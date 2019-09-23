@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
                 try {
                     udp.send(control_imitator);
                     Log.v("UDP_out", String.valueOf(control_imitator[0])+"    "+String.valueOf(control_imitator[1]));
-                    sleep(100);
+                    //sleep(100);
                 } catch (Exception e)
                 {
                     e.printStackTrace();
@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
 
                         byte[] pulse_byte = new byte[]{(byte) mHeartRate};
                         udp.send_pulse(pulse_byte);
-                        Log.v("pulse_out", String.valueOf(pulse_byte[0]));
+                        Log.v("udp_pulse_out", String.valueOf(pulse_byte[0]));
                         sleep(100);
                     } catch (Exception e) {
                         e.printStackTrace();
