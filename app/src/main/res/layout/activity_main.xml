@@ -33,12 +33,26 @@
         android:textSize="30sp" />
 
     <TextView
-        android:id="@+id/imitator"
+        android:id="@+id/damper_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="imitator"
-        android:textSize="30sp"
-        />
+        android:text="@string/damper_text"
+        android:textSize="28sp" />
+
+    <SeekBar
+        android:id="@+id/damperBar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginLeft="50dp"
+        android:minHeight="55dp"
+        android:paddingLeft="40sp"
+        android:paddingRight="5sp" />
+    <TextView
+        android:id="@+id/imitator"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:text="@string/imitator_error"
+        android:textSize="30sp" />
 
     <Button
         android:id="@+id/heat_start"
@@ -54,28 +68,5 @@
         android:text="@string/heat_btn_stop"
         android:textSize="30sp" />
 
-    <TextView
-        android:id="@+id/damper_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/damper_text"
-        android:textSize="30sp" />
-
-    <SeekBar
-        android:id="@+id/damperBar"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginLeft="30dp"
-        android:minHeight="55dp"
-        android:paddingLeft="20sp"
-        android:paddingRight="5sp" />
-
-    <TextView
-        android:id="@+id/temperature"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/temperature"
-        android:textSize="30sp"
-        android:visibility="invisible" />
 
 </LinearLayout>

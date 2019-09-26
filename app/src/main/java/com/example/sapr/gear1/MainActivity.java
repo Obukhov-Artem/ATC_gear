@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
 
     private  TextView pulseView;
     private  TextView dampView;
-    private  TextView tempView;
     private  TextView imitatorView;
 
     private static final String LOG_TAG = "MyHeart";
@@ -65,7 +64,6 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
         control_imitator = new byte[] {0,0};
         damp_string = getResources().getString(R.string.damper_text);
         pulseView = (TextView)findViewById(R.id.pulse_value);
-        tempView = (TextView)findViewById(R.id.temperature);
         dampView = (TextView)findViewById(R.id.damper_text);
         imitatorView = (TextView)findViewById(R.id.imitator);
         Log.d(LOG_TAG, "start app");
@@ -78,9 +76,6 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
         btnStart.setVisibility(Button.VISIBLE);
         heatStart.setVisibility(Button.VISIBLE);
         heatPause.setVisibility(Button.GONE);
-        //Log.d("Display",Integer.toString(dm.widthPixels));
-        // Log.d("Display",Integer.toString(dm.heightPixels));
-        // Log.d("Display",Integer.toString(dm.densityDpi));
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,9 +134,9 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
         damper.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                dampView.setText(damp_string+ String.format("( %d /100) ",i));
+                //dampView.setText(damp_string+ String.format("( %d /100) ",i));
 
-                control_imitator[1]=(byte)i;
+                control_imitator[1]=(byte)(100-i);
                 startSend();
             }
 
@@ -209,7 +204,7 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
                 try {
                     udp.send(control_imitator);
                     Log.v("UDP_out", String.valueOf(control_imitator[0])+"    "+String.valueOf(control_imitator[1]));
-                    //sleep(100);
+
                 } catch (Exception e)
                 {
                     e.printStackTrace();
@@ -217,7 +212,6 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
             }
             public void end()
             {
-                // running = false;
                 udp.end();
             }
         });

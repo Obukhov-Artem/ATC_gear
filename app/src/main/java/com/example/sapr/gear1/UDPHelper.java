@@ -21,7 +21,7 @@ public class UDPHelper extends Thread {
     private  DatagramSocket clientSocket;
     private DatagramSocket socket;
     private static final int PORT_IM_IN = 3022;
-    private static final int PORT_PC_IN = 3041;
+    private static final int PORT_PC_IN = 3021;
     private static final int PORT_IM_OUT = 3021;//??? проверить получаем ли данные с имитатора
     private static final int PORT_MY1 = 3024;
     private static final int PORT_MY2 = 3025;
@@ -37,18 +37,6 @@ public class UDPHelper extends Thread {
     private float temperature;
     private float pressure;
     private float inner_temp;
-    /*
-        public void send(String msg) throws IOException {
-            DatagramSocket clientSocket = new DatagramSocket();
-            clientSocket.setBroadcast(true);
-           // Log.d("UDP_out",msg);
-            byte[] sendData = msg.getBytes();
-            Log.d("UDP_out",String.valueOf(sendData[0])+" "+String.valueOf(sendData[1])+" "+String.valueOf(sendData[2])+" "+String.valueOf(sendData[3]));
-            DatagramPacket sendPacket = new DatagramPacket(
-                    sendData, sendData.length, getBroadcastAddress(), PORT_IM_IN);
-            clientSocket.send(sendPacket);
-        }
-        */
     public void send(byte[] sendData) throws IOException {
 
         DatagramPacket sendPacket = new DatagramPacket(
@@ -73,15 +61,15 @@ public class UDPHelper extends Thread {
                 byte[] buf = new byte[1024];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);
+
 /*
                 temperature =packet.getData()[0];
                 pressure =packet.getData()[1];
                 inner_temp =packet.getData()[2];*/
                 byte[] data = packet.getData();
-                //     Log.d("UDP",String.valueOf(temperature)+" "+String.valueOf(damp)+" "+String.valueOf(inner_temp)+" "+String.valueOf(packet.getData()[4]));
-                //   Log.d("UDP",String.valueOf(packet.getData()[0])+" "+String.valueOf(packet.getData()[1])+" "+String.valueOf(packet.getData()[2])+" "+String.valueOf(packet.getData()[3])+" "+String.valueOf(packet.getData()[4])+" "+String.valueOf(packet.getData()[5])+" "+String.valueOf(packet.getData()[6])+" "+String.valueOf(packet.getData()[7])+" "+String.valueOf(packet.getData()[8]));
-                // Log.d("UDP",String.valueOf(data[0])+" "+String.valueOf(data[1])+" "+String.valueOf(data[2])+" "+String.valueOf(data[3])+" "+String.valueOf(data[4])+" "+String.valueOf(data[5]));
-                int temp_arz = (((data[0] & 0xFF) * 256) + (data[1] & 0xC0)) / 64;
+                Log.d("length",String.valueOf(data[5]));
+                if (data[5]!=0){
+                    int temp_arz = (((data[0] & 0xFF) * 256) + (data[1] & 0xC0)) / 64;
                 if (temp_arz > 511) { temp_arz -= 1024; }
                 temperature = temp_arz * 0.25f;
                 Log.d("UDP_temp",String.valueOf(temperature));
@@ -90,9 +78,6 @@ public class UDPHelper extends Thread {
 
                 pressure = (((pressure_raw - 1024) * 500 * 2.0f) / 60000.0f) - 500;
 
-                // float rd_pressure_V = (0.0182f * pressure*pressure + (0.0261f * pressure) - 0.2241f);
-
-                //if (pressure < 0) { rd_pressure_V = -rd_pressure_V; }
 
                 int temp_raw = ((data[4] & 0xFF) << 8) + (data[5] & 0xFF);
                 inner_temp = (temp_raw - 10214.0f) / 37.39f;
@@ -101,6 +86,7 @@ public class UDPHelper extends Thread {
                 Log.d("UDP_pressure",String.valueOf(pressure));
                 Log.d("UDP_inner_temp",String.valueOf(inner_temp));
                 listener.onReceive(temperature,pressure,inner_temp);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -118,7 +104,7 @@ public class UDPHelper extends Thread {
 
     InetAddress getBroadcastAddress() throws IOException {
         WifiManager wifi = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
-        DhcpInfo dhcp = wifi.getDhcpInfo(); 
+        DhcpInfo dhcp = wifi.getDhcpInfo();
         if(dhcp == null)
             return InetAddress.getByName("255.255.255.255");
         int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;

@@ -11,6 +11,7 @@
     <string name="heat_btn_start">Начать нагрев</string>
     <string name="heat_btn_stop">Закончить нагрев</string>
     <string name="wait">Подождите...</string>
-    <string name="damper_text">Заслонка</string>
+    <string name="damper_text">Заслонка (Открыта...Закрыта)</string>
     <string name="imitator">Температура = %1$d Давление = %2$d Внутренняя темп. = %3$d</string>
+    <string name="imitator_error">Имитатор не найден</string>
 </resources>
