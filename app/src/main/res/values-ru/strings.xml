@@ -15,4 +15,5 @@
     <string name="imitator">Температура на входе = %1$d Давление = %2$d Внутренняя темп. = %3$d</string>
     <string name="imitator_error">Имитатор не найден</string>
     <string name="temp_text">Предельная температура</string>
+    <string name="synchro">Cинхронизация</string>
 </resources>

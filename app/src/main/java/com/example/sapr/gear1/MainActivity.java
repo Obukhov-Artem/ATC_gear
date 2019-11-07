@@ -12,6 +12,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.Formatter;
@@ -31,12 +32,12 @@ import java.util.TimerTask;
 
 import static java.lang.Thread.sleep;
 
-public class MainActivity extends AppCompatActivity   implements SensorEventListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
-    private  TextView pulseView;
-    private  TextView dampView;
-    private  TextView imitatorView;
-    private  TextView tempView;
+    private TextView pulseView;
+    private TextView dampView;
+    private TextView imitatorView;
+    private TextView tempView;
 
     private static final String LOG_TAG = "MyHeart";
     private Drawable imgStart;
@@ -49,11 +50,11 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
     private int temperature;
     private int pressure;
     private int inner_temp;
-    private int param_temp=0;
-    private int param_damp=0;
-    private int status_update=0;
-    private int status_start=0;
-    private int im_temp_max=70;
+    private int param_temp = 0;
+    private int param_damp = 0;
+    private int status_update;
+    private int status_start = 0;
+    private int im_temp_max = 70;
     int mHeartRate;
 
     private Button btnStart;
@@ -68,20 +69,18 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
     private Thread udpConnect2;
     private Thread udpConnect3;
 
-    private Timer mTimer;
-    private MyTimerTask mTimerTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         pulse_string = getResources().getString(R.string.pulse);
-        control_imitator = new byte[] {0,0,0};
+        control_imitator = new byte[]{0, 0, 0};
         damp_string = getResources().getString(R.string.damper_text);
-        pulseView = (TextView)findViewById(R.id.pulse_value);
-        dampView = (TextView)findViewById(R.id.damper_text);
-        tempView = (TextView)findViewById(R.id.temp_text);
-        imitatorView = (TextView)findViewById(R.id.imitator);
+        pulseView = (TextView) findViewById(R.id.pulse_value);
+        dampView = (TextView) findViewById(R.id.damper_text);
+        tempView = (TextView) findViewById(R.id.temp_text);
+        imitatorView = (TextView) findViewById(R.id.imitator);
         Log.d(LOG_TAG, "start app");
         btnStart = (Button) findViewById(R.id.btnStart);
         btnPause = (Button) findViewById(R.id.btnPause);
@@ -92,16 +91,11 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
         heatStart.setVisibility(Button.GONE);
         heatPause.setVisibility(Button.GONE);
         status_start = 0;
-        if (status_start ==0){
-            status_start = 1;
-            control_imitator[0]=2;
-            startSend();
-        }
 
         if (savedInstanceState != null) {
             temperature = savedInstanceState.getInt("temperature");
-            pressure =  savedInstanceState.getInt("pressure");
-            inner_temp =  savedInstanceState.getInt("inner_temp");
+            pressure = savedInstanceState.getInt("pressure");
+            inner_temp = savedInstanceState.getInt("inner_temp");
             dampView.setText(damp_string + String.format(" - %d ", savedInstanceState.getInt("damper")) + "%");
             damper.setProgress(savedInstanceState.getInt("damper"));
             heatStart.setVisibility(savedInstanceState.getInt("heatStart"));
@@ -112,40 +106,36 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
             imitatorView.setText(imitator_string);
 
 
-
         }
 
 
+        if (btnStart.getVisibility() != View.GONE) {
+            btnPause.setVisibility(Button.GONE);
+            btnStart.setVisibility(Button.VISIBLE);
 
-        if (btnStart.getVisibility() !=View.GONE){
-        btnPause.setVisibility(Button.GONE);
-        btnStart.setVisibility(Button.VISIBLE);
+            btnStart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    btnPause.setVisibility(Button.VISIBLE);
+                    btnStart.setVisibility(Button.GONE);
+                    pulseView.setText(R.string.wait);
+                    startMeasure();
+                    startSend();
 
-        btnStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                btnPause.setVisibility(Button.VISIBLE);
-                btnStart.setVisibility(Button.GONE);
-                pulseView.setText(R.string.wait);
-                startMeasure();
-                startSend();
+                    startSendPulse();
+                }
+            });
 
-                startSendPulse();
-                mTimer.cancel();
-            }
-        });
-
-        btnPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                btnPause.setVisibility(Button.GONE);
-                btnStart.setVisibility(Button.VISIBLE);
-                pulseView.setText(pulse_string+": --");
-                stopMeasure();
-                startSend();
-                reCheckTimer();
-            }
-        });
+            btnPause.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    btnPause.setVisibility(Button.GONE);
+                    btnStart.setVisibility(Button.VISIBLE);
+                    pulseView.setText(pulse_string + ": --");
+                    stopMeasure();
+                    startSend();
+                }
+            });
 
         }
         heatStart.setOnClickListener(new View.OnClickListener() {
@@ -157,9 +147,8 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
                         R.string.heat_start,
                         Toast.LENGTH_SHORT);
                 toast.show();
-                control_imitator[0]=1;
+                control_imitator[0] = 1;
                 startSend();
-                reCheckTimer();
 
 
             }
@@ -174,21 +163,19 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
                         R.string.heat_stop,
                         Toast.LENGTH_SHORT);
                 toast.show();
-                control_imitator[0]=0;
+                control_imitator[0] = 0;
                 startSend();
-                mTimer.cancel();
             }
         });
 
         damper.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if (pulseView.getVisibility()== View.GONE) {
-                    dampView.setText(damp_string + String.format(" - %d ", i)+"%");
+                if (pulseView.getVisibility() == View.GONE) {
+                    dampView.setText(damp_string + String.format(" - %d ", i) + "%");
                 }
-                control_imitator[1]=(byte)(i);
+                control_imitator[1] = (byte) (i);
                 startSend();
-                reCheckTimer();
             }
 
             @Override
@@ -204,9 +191,9 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
         damper_temp.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                int value = (int)((float)(i*im_temp_max/100));
-                tempView.setText(getResources().getString(R.string.temp_text) + String.format("  %d ", value)+"C");
-                control_imitator[2]=(byte)(value);
+                int value = (int) i;
+                tempView.setText(getResources().getString(R.string.temp_text) + String.format("  %d ", value) + "C");
+                control_imitator[2] = (byte) (value);
                 startSend();
             }
 
@@ -222,11 +209,26 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
         });
 
 
-
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
 
-    startData();
+        startData();
+        SystemClock.sleep(300);
+        while (status_start == 0) {
+
+            SystemClock.sleep(100);
+            control_imitator[0] = 2;
+            startSend();
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    R.string.synchro,
+                    Toast.LENGTH_SHORT);
+            toast.show();
+            if (status_update > 0) {
+                status_start = 1;
+                control_imitator[0] = 0;
+                break;
+            }
+        }
 
     }
 
@@ -245,37 +247,47 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
         savedInstanceState.putString("imitator_string", imitator_string);
 
     }
-    private  void  startData(){
+
+    private void startData() {
         udpConnect = new Thread(new Runnable() {
 
             boolean running;
+
             @Override
             public void run() {
                 try {
                     udp = new UDPHelper(getApplicationContext(), new UDPHelper.BroadcastListener() {
                         @Override
-                        public void onReceive(int status, float temp_value, float pressure_value, float inner_temp_value, int im_damper, int im_temp) {
-                            status_update = status;
-                            if (status_update == 0){
-                                temperature = Math.round(temp_value);
-                                pressure =  Math.round(pressure_value);
-                                inner_temp =  Math.round(inner_temp_value);
-                                imitator_string = String.format(getResources().getString(R.string.imitator), temperature, pressure, inner_temp);
+                        public void onReceive(int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp,int im_damper,  int im_max_temp) {
+                            if(status==1){
+                                status_update = 1;
 
                             }
-                            else{
+                            if (status == 0) {
+                                temperature = Math.round(temp_value);
+                                pressure = Math.round(pressure_value);
+                                inner_temp = Math.round(inner_temp_value);
+                                imitator_string = String.format(getResources().getString(R.string.imitator), temperature, pressure, inner_temp);
+
+                            } else {
                                 param_temp = im_temp;
                                 param_damp = im_damper;
+                                im_temp_max = im_max_temp;
                             }
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if(status_update == 0) {
+                                    if (status_update == 0) {
                                         imitatorView.setText(imitator_string);
-                                    }
-                                    else{
+                                    } else {
+                                        status_update = 0;
                                         dampView.setText(damp_string + String.format(" - %d ", param_damp) + "%");
                                         damper.setProgress(param_damp);
+                                        damper_temp.setProgress(im_temp_max);
+
+                                        control_imitator[0] = (byte) param_temp;
+                                        control_imitator[1] = (byte) param_damp;
+                                        control_imitator[2] = (byte) im_temp_max;
 
                                         if (param_temp == 1) {
                                             heatStart.setVisibility(Button.GONE);
@@ -297,6 +309,7 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
                     e.printStackTrace();
                 }
             }
+
             public void end() {
                 udp.end();
             }
@@ -306,25 +319,22 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
 
     }
 
-    private void startSend()
-    {
+    private void startSend() {
         udpConnect2 = new Thread(new Runnable() {
 
             @Override
-            public void run()
-            {
+            public void run() {
 
                 try {
                     udp.send(control_imitator);
-                    Log.v("UDP_out", String.valueOf(control_imitator[0])+"    "+String.valueOf(control_imitator[1]));
+                    Log.d("UDP_out", String.valueOf(control_imitator[0]) + "    " + String.valueOf(control_imitator[1]) + "    " + String.valueOf(control_imitator[2]));
 
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            public void end()
-            {
+
+            public void end() {
                 udp.end();
             }
         });
@@ -332,16 +342,13 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
         udpConnect2.start();
 
 
-
-
     }
-    private void startSendPulse()
-    {
-          udpConnect3 = new Thread(new Runnable() {
+
+    private void startSendPulse() {
+        udpConnect3 = new Thread(new Runnable() {
 
             @Override
-            public void run()
-            {
+            public void run() {
                 while (true) {
                     try {
 
@@ -354,16 +361,14 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
                     }
                 }
             }
-            public void end()
-            {
+
+            public void end() {
                 // running = false;
                 udp.end();
             }
         });
 
         udpConnect3.start();
-
-
 
 
     }
@@ -379,7 +384,7 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
 
     @Override
     protected void onResume() {
-        Log.d("onResume","-");
+        Log.d("onResume", "-");
 
         super.onResume();
         startData();
@@ -387,7 +392,7 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
 
     @Override
     protected void onPause() {
-        Log.d("onPause","-");
+        Log.d("onPause", "-");
         super.onPause();
 
         stopMeasure();
@@ -395,18 +400,19 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
 
     @Override
     protected void onStop() {
-        Log.d("onStop","-");
+        Log.d("onStop", "-");
         super.onStop();
 
         stopMeasure();
     }
-    @Override
-    protected void onDestroy(){
 
-        Log.d("onDestroy","-");
+    @Override
+    protected void onDestroy() {
+
+        Log.d("onDestroy", "-");
         udpConnect.interrupt();
         udp.end();
-        Log.d("onDestroy",String.valueOf(udp.status()));
+        Log.d("onDestroy", String.valueOf(udp.status()));
         super.onDestroy();
     }
 
@@ -416,7 +422,7 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
 
         mHeartRate = Math.round(mHeartRateFloat);
 
-        pulseView.setText(pulse_string+": " + String.format("%d",mHeartRate));
+        pulseView.setText(pulse_string + ": " + String.format("%d", mHeartRate));
 
 
     }
@@ -426,40 +432,7 @@ public class MainActivity extends AppCompatActivity   implements SensorEventList
 
     }
 
-    private void reCheckTimer(){
-        return;
-        /*
-        if (mTimer != null) {
-            mTimer.cancel();
-        }
-        mTimer = new Timer();
-        mTimerTask = new MyTimerTask();
-        mTimer.schedule(mTimerTask, 10000, 10000);*/
-    }
 
-    class MyTimerTask extends TimerTask {
-
-        @Override
-        public void run() {
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    Log.d("timer","done");
-                    dampView.setText(damp_string + String.format(" - %d ", param_damp) + "%");
-                    damper.setProgress(param_damp);
-
-                    if (param_temp == 1) {
-                        heatStart.setVisibility(Button.GONE);
-                        heatPause.setVisibility(Button.VISIBLE);
-                    } else {
-                        heatStart.setVisibility(Button.VISIBLE);
-                        heatPause.setVisibility(Button.GONE);
-                    }
-                }
-            });
-        }
-    }
 
 }
 

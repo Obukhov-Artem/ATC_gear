@@ -14,4 +14,5 @@
     <string name="temp_text">Temperature limit</string>
     <string name="imitator">Temperature = %1$d Pressure = %2$d Inner temp. = %3$d</string>
     <string name="imitator_error">Imitator not found</string>
+    <string name="synchro">Synchronization</string>
 </resources>

@@ -43,6 +43,7 @@ public class UDPHelper extends Thread {
     private float inner_temp;
     private int im_damper;
     private int im_temp;
+    private int im_max_temp;
 
     public void send(byte[] sendData) throws IOException {
 
@@ -72,29 +73,34 @@ public class UDPHelper extends Thread {
                 socket.receive(packet);
                 byte[] data = packet.getData();
                 int status = data[0];
+                Log.d("STATUS", String.valueOf(status));
                 if (status == 0) {
-                    if (data[6] != 0) {
-                        int temp_arz = (((data[1] & 0xFF) * 256) + (data[2] & 0xC0)) / 64;
-                        if (temp_arz > 511) {
-                            temp_arz -= 1024;
-                        }
-                        temperature = temp_arz * 0.25f;
-                        int pressure_raw = ((data[3] & 0xFF) << 8) + (data[4] & 0xFF);
 
-                        pressure = (((pressure_raw - 1024) * 500 * 2.0f) / 60000.0f) - 500;
-                        int temp_raw = ((data[5] & 0xFF) << 8) + (data[6] & 0xFF);
-                        inner_temp = (temp_raw - 10214.0f) / 37.39f;
-                        //Log.d("UDP_pressure",String.valueOf(pressure));
-                        //Log.d("UDP_inner_temp",String.valueOf(inner_temp));
-                        listener.onReceive(status, temperature, pressure, inner_temp, 0, 0);
-
+                    int temp_arz = (((data[1] & 0xFF) * 256) + (data[2] & 0xC0)) / 64;
+                    if (temp_arz > 511) {
+                        temp_arz -= 1024;
                     }
+                    temperature = temp_arz * 0.25f;
+                    int pressure_raw = ((data[3] & 0xFF) << 8) + (data[4] & 0xFF);
+
+                    pressure = (((pressure_raw - 1024) * 500 * 2.0f) / 60000.0f) - 500;
+                    int temp_raw = ((data[5] & 0xFF) << 8) + (data[6] & 0xFF);
+                    inner_temp = (temp_raw - 10214.0f) / 37.39f;
+                    //Log.d("UDP_temperature",String.valueOf(temperature));
+                    //Log.d("UDP_pressure",String.valueOf(pressure));
+                    //Log.d("UDP_inner_temp",String.valueOf(inner_temp));
+                    listener.onReceive(status, temperature, pressure, inner_temp, 0, 0,0);
+
+
                 } else {
+                    im_temp = data[1];
                     im_damper = data[2];
-                    im_temp = data[3];
-                    Log.d("IMITATOR", String.valueOf(im_damper));
-                    Log.d("IMITATOR", String.valueOf(im_temp));
-                    listener.onReceive(status, 0, 0, 0, im_damper, im_temp);
+                    im_max_temp = data[3];
+
+                    Log.d("IMITATOR_temp", String.valueOf(im_temp));
+                    Log.d("IMITATOR_damper", String.valueOf(im_damper));
+                    Log.d("IMITATOR_max_temp", String.valueOf(im_max_temp));
+                    listener.onReceive(status, 0, 0, 0, im_temp,im_damper, im_max_temp);
                 }
 
             } catch (IOException e) {
@@ -114,7 +120,8 @@ public class UDPHelper extends Thread {
     }
 
     public interface BroadcastListener {
-        public void onReceive(int status, float temp_value, float pressure_value, float inner_temp_value, int im_damper, int im_temp);
+        public void onReceive(int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp,int im_damper, int im_max_temp);
+
     }
 
     InetAddress getBroadcastAddress() throws IOException {
