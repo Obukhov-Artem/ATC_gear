@@ -175,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     dampView.setText(damp_string + String.format(" - %d ", i) + "%");
                 }
                 control_imitator[1] = (byte) (i);
-                startSend();
             }
 
             @Override
@@ -186,16 +185,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+                startSend();
             }
         });
         damper_temp.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                int value = (int) i;
+                int value = 30+(int)((float)i*40/100);
                 tempView.setText(getResources().getString(R.string.temp_text) + String.format("  %d ", value) + "C");
                 control_imitator[2] = (byte) (value);
-                startSend();
+
             }
+
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -204,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                startSend();
             }
         });
 
@@ -283,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                         status_update = 0;
                                         dampView.setText(damp_string + String.format(" - %d ", param_damp) + "%");
                                         damper.setProgress(param_damp);
-                                        damper_temp.setProgress(im_temp_max);
+                                        damper_temp.setProgress((int)((im_temp_max-30)*2.5));
 
                                         control_imitator[0] = (byte) param_temp;
                                         control_imitator[1] = (byte) param_damp;
