@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <TextView
             android:id="@+id/pulse_value"
             android:layout_width="match_parent"
@@ -22,6 +23,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
         <Button
             android:id="@+id/btnStart"
             android:layout_width="match_parent"
@@ -48,8 +50,8 @@
             android:id="@+id/heat_start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/heat_btn_start"
             android:background="@color/blue"
+            android:text="@string/heat_btn_start"
 
             android:textSize="@dimen/text_size" />
 
@@ -57,8 +59,8 @@
             android:id="@+id/heat_stop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/heat_btn_stop"
             android:background="@color/red"
+            android:text="@string/heat_btn_stop"
 
             android:textSize="@dimen/text_size" />
 
@@ -78,6 +80,7 @@
             android:minHeight="55dp"
             android:paddingLeft="40sp"
             android:paddingRight="5sp" />
+
         <TextView
             android:id="@+id/temp_text"
             android:layout_width="match_parent"
@@ -86,6 +89,7 @@
             android:text="@string/temp_text"
 
             android:textSize="@dimen/text_size" />
+
         <SeekBar
             android:id="@+id/tempBar"
             android:layout_width="match_parent"
@@ -95,9 +99,6 @@
             android:minHeight="55dp"
             android:paddingLeft="40sp"
             android:paddingRight="5sp" />
-
-
-
 
 
     </LinearLayout>

@@ -1,4 +1,4 @@
-package com.example.sapr.gear1;
+package com.example.sapr.gear2;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,13 +7,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
-
-
-import java.util.List;
 
 /**
  * Created by uwe on 01.04.15.

@@ -1,20 +1,15 @@
-package com.example.sapr.gear1;
+package com.example.sapr.gear2;
 
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.os.Debug;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
 
 
 public class UDPHelper extends Thread {

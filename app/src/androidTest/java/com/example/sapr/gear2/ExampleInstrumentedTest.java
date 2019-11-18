@@ -1,4 +1,4 @@
-package com.example.sapr.gear1;
+package com.example.sapr.gear2;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

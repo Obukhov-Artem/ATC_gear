@@ -1,4 +1,4 @@
-package com.example.sapr.gear1;
+package com.example.sapr.gear2;
 
 import org.junit.Test;
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Пульт</string>
+    <string name="app_name">Пульт 2</string>
     <string name="pulse">Пульс</string>
     <string name="start">Старт</string>
     <string name="heat_start">Нагрев начался</string>
@@ -16,4 +16,5 @@
     <string name="imitator_error">Имитатор не найден</string>
     <string name="temp_text">Предельная температура</string>
     <string name="synchro">Cинхронизация</string>
+    <string name="synchro_repeat">Повторить</string>
 </resources>

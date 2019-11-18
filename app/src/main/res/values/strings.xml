@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">gear</string>
+    <string name="app_name">gear2</string>
     <string name="pulse">Pulse</string>
     <string name="heat">Heating</string>
     <string name="heat_start">Heating start</string>
@@ -15,4 +15,5 @@
     <string name="imitator">Temperature = %1$d Pressure = %2$d Inner temp. = %3$d</string>
     <string name="imitator_error">Imitator not found</string>
     <string name="synchro">Synchronization</string>
+    <string name="synchro_repeat">Repeat</string>
 </resources>

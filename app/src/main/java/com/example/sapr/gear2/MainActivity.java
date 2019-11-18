@@ -1,34 +1,30 @@
-package com.example.sapr.gear1;
+package com.example.sapr.gear2;
 
-import android.app.Service;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.wifi.WifiManager;
-import android.os.IBinder;
 import android.os.SystemClock;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.Formatter;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static java.lang.Thread.sleep;
 
@@ -57,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int status_start = 0;
     private int im_temp_max = 70;
     int mHeartRate;
+    private int data_num=0;
 
     private Button btnStart;
     private Button btnPause;
@@ -70,6 +67,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Thread udpConnect2;
     private Thread udpConnect3;
 
+    Snackbar snackbar;
+
+    private GraphView graph;
+    private LineGraphSeries<DataPoint> series;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +93,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         heatStart.setVisibility(Button.GONE);
         heatPause.setVisibility(Button.GONE);
         status_start = 0;
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+
+        graph = (GraphView) findViewById(R.id.graph);
+
 
         if (savedInstanceState != null) {
             temperature = savedInstanceState.getInt("temperature");
@@ -105,9 +111,45 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             btnPause.setVisibility(savedInstanceState.getInt("btnPause"));
             imitator_string = savedInstanceState.getString("imitator_string");
             imitatorView.setText(imitator_string);
-
+            init_component();
 
         }
+        else{
+
+            init_component();
+            startData();
+            SystemClock.sleep(300);
+            sinhro_initator();
+
+        }
+
+
+
+
+
+    }
+
+
+    private void init_component(){
+
+        series = new LineGraphSeries<>(new DataPoint[]{
+                new DataPoint(0, 0),
+                new DataPoint(1, 2),
+                new DataPoint(2, 4),
+                new DataPoint(3, 8),
+                new DataPoint(4, 7),
+                new DataPoint(5, 2),
+                new DataPoint(6, -5),
+        });
+        graph.addSeries(series);
+
+        series.setDrawDataPoints(true);
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(100);
+
+
+
 
 
         if (btnStart.getVisibility() != View.GONE) {
@@ -192,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         damper_temp.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                int value = 30+(int)((float)i*40/100);
+                int value = 30 + (int) ((float) i * 40 / 100);
                 tempView.setText(getResources().getString(R.string.temp_text) + String.format("  %d ", value) + "C");
                 control_imitator[2] = (byte) (value);
 
@@ -211,33 +253,57 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
 
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+    }
 
-        startData();
-        SystemClock.sleep(300);
-        while (status_start == 0) {
+    private void sinhro_initator(){
 
-            SystemClock.sleep(100);
+        SystemClock.sleep(100);
+        int n=0;
+        while (n<5) {
+            n +=1;
+            SystemClock.sleep(50);
             control_imitator[0] = 2;
             startSend();
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    R.string.synchro,
-                    Toast.LENGTH_SHORT);
-            toast.show();
             if (status_update > 0) {
                 status_start = 1;
                 control_imitator[0] = 0;
-                break;
+                return;
             }
         }
 
-    }
 
+        if(status_start==0){
+            CharSequence text =  getResources().getString(R.string.synchro);
+            int duration = Snackbar.LENGTH_INDEFINITE;
+            snackbar = Snackbar.make(findViewById(R.id.layout_main), text, duration);
+            snackbar.setAction(getResources().getString(R.string.synchro_repeat), new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    control_imitator[0] = 2;
+                    startSend();
+
+                    control_imitator[0] = 0;
+
+                    SystemClock.sleep(200);
+                    if (status_update !=1) {
+
+                        sinhro_initator();
+                    }
+                }
+            });
+            snackbar.show();
+
+        }
+
+
+
+    }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
+
+
         savedInstanceState.putInt("temperature", temperature);
         savedInstanceState.putInt("pressure", pressure);
         savedInstanceState.putInt("inner_temp", inner_temp);
@@ -260,8 +326,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 try {
                     udp = new UDPHelper(getApplicationContext(), new UDPHelper.BroadcastListener() {
                         @Override
-                        public void onReceive(int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp,int im_damper,  int im_max_temp) {
-                            if(status==1){
+                        public void onReceive(int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp, int im_damper, int im_max_temp) {
+                            if (status == 1) {
                                 status_update = 1;
 
                             }
@@ -270,6 +336,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                 pressure = Math.round(pressure_value);
                                 inner_temp = Math.round(inner_temp_value);
                                 imitator_string = String.format(getResources().getString(R.string.imitator), temperature, pressure, inner_temp);
+                                series.appendData(new DataPoint(data_num, pressure),true,100);
+                                data_num +=1;
 
                             } else {
                                 param_temp = im_temp;
@@ -285,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                         status_update = 0;
                                         dampView.setText(damp_string + String.format(" - %d ", param_damp) + "%");
                                         damper.setProgress(param_damp);
-                                        damper_temp.setProgress((int)((im_temp_max-30)*2.5));
+                                        damper_temp.setProgress((int) ((im_temp_max - 30) * 2.5));
 
                                         control_imitator[0] = (byte) param_temp;
                                         control_imitator[1] = (byte) param_damp;
