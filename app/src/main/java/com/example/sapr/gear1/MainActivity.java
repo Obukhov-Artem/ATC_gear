@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView dampView;
     private TextView imitatorView;
     private TextView tempView;
+    private int test;
 
     private static final String LOG_TAG = "MyHeart";
     private Drawable imgStart;
