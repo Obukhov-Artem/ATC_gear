@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Adapter;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -33,13 +34,14 @@ public class MainActivity extends AppCompatActivity implements GraphListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
     }
 
     @Override
     public void addSeries(float data) {
-
-        Log.d("DATA ", String.valueOf(data));
+        GraphFragment gf = (GraphFragment)getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
+        if (gf != null && gf.isInLayout()){
+            gf.addSeries(data);
+        }
     }
 }
 

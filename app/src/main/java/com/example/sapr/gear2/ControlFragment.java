@@ -98,6 +98,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
         damper = (SeekBar) layout.findViewById(R.id.damperBar);
         damper_temp = (SeekBar) layout.findViewById(R.id.tempBar);
         heatStart.setVisibility(Button.GONE);
+        heatStart.setVisibility(Button.GONE);
         heatPause.setVisibility(Button.GONE);
         status_start = 0;
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
@@ -117,6 +118,9 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             btnPause.setVisibility(savedInstanceState.getInt("btnPause"));
             imitator_string = savedInstanceState.getString("imitator_string");
             imitatorView.setText(imitator_string);
+            control_imitator[0] = (byte)savedInstanceState.getInt("c1");
+            control_imitator[1] = (byte)savedInstanceState.getInt("c2");
+            control_imitator[2] = (byte)savedInstanceState.getInt("c3");
             init_component();
 
         }
@@ -203,9 +207,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 }
                 control_imitator[1] = (byte) (i);
 
-                g_listener.addSeries(i);
 
-                Log.d("damper","alive");
             }
 
             @Override
@@ -293,7 +295,9 @@ public class ControlFragment extends Fragment implements SensorEventListener {
         super.onSaveInstanceState(savedInstanceState);
 
 
-        savedInstanceState.putInt("temperature", temperature);
+        savedInstanceState.putInt("с1", control_imitator[0]);
+        savedInstanceState.putInt("с2", control_imitator[1]);
+        savedInstanceState.putInt("с3", control_imitator[2]);
         savedInstanceState.putInt("pressure", pressure);
         savedInstanceState.putInt("inner_temp", inner_temp);
         savedInstanceState.putInt("damper", damper.getProgress());
@@ -330,9 +334,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                 inner_temp = Math.round(inner_temp_value);
                                 imitator_string = String.format(getResources().getString(R.string.imitator), temperature, pressure, inner_temp);
                                 //series.appendData(new DataPoint(data_num, pressure),true,100);
-                                if (g_listener != null) {
-                                    g_listener.addSeries(pressure);
-                                }
+
 
                             } else {
                                 param_temp = im_temp;
@@ -344,6 +346,9 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                 public void run() {
                                     if (status_update == 0) {
                                         imitatorView.setText(imitator_string);
+                                        if (g_listener != null) {
+                                            g_listener.addSeries(param_damp);
+                                        }
                                     } else {
                                         status_update = 0;
                                         dampView.setText(damp_string + String.format(" - %d ", param_damp) + "%");
