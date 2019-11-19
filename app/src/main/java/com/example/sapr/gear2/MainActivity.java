@@ -12,6 +12,7 @@ import android.os.SystemClock;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,7 +21,13 @@ import java.util.Calendar;
 
 import static java.lang.Thread.sleep;
 
-public class MainActivity extends AppCompatActivity {
+
+interface GraphListener {
+    void addSeries(float data);
+};
+
+
+public class MainActivity extends AppCompatActivity implements GraphListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void addSeries(float data) {
+
+        Log.d("DATA ", String.valueOf(data));
+    }
 }
 
 

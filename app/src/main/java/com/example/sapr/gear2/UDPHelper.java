@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 
 
 public class UDPHelper extends Thread {
@@ -27,9 +29,12 @@ public class UDPHelper extends Thread {
     public UDPHelper(Context ctx, BroadcastListener listener) throws IOException {
         this.listener = listener;
         this.ctx = ctx;
-        clientSocket = new DatagramSocket(PORT_MY2);
+        //clientSocket = new DatagramSocket(PORT_MY2);
+        //clientSocket.setBroadcast(true);
+        clientSocket  = new DatagramSocket(null);
+        clientSocket.setReuseAddress(true);
+        clientSocket.bind(new InetSocketAddress(PORT_MY2));
         clientSocket.setBroadcast(true);
-
 
     }
 

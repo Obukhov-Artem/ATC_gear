@@ -1,6 +1,7 @@
 package com.example.sapr.gear2;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
@@ -72,11 +73,6 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private GraphListener g_listener;
 
 
-    interface GraphListener {
-        void addSeries(float data);
-    };
-
-
     public ControlFragment() {
         // Required empty public constructor
     }
@@ -133,7 +129,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
 
         }
 
-        return inflater.inflate(R.layout.fragment_control, container, false);
+        return layout;
     }
 
 
@@ -206,6 +202,8 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                     dampView.setText(damp_string + String.format(" - %d ", i) + "%");
                 }
                 control_imitator[1] = (byte) (i);
+
+                g_listener.addSeries(i);
 
                 Log.d("damper","alive");
             }
@@ -472,6 +470,13 @@ public class ControlFragment extends Fragment implements SensorEventListener {
         super.onStop();
 
         stopMeasure();
+    }
+
+    @Override
+    public void onAttach(Context a){
+        super.onAttach(a);
+        Log.d("attach","23432424");
+        g_listener = (GraphListener)a;
     }
 
     @Override
