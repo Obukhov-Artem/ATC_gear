@@ -206,6 +206,8 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                     dampView.setText(damp_string + String.format(" - %d ", i) + "%");
                 }
                 control_imitator[1] = (byte) (i);
+
+                Log.d("damper","alive");
             }
 
             @Override
