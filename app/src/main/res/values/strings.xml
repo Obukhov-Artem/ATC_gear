@@ -16,4 +16,7 @@
     <string name="imitator_error">Imitator not found</string>
     <string name="synchro">Synchronization</string>
     <string name="synchro_repeat">Repeat</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
