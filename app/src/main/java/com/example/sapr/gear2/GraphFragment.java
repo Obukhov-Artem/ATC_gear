@@ -84,10 +84,10 @@ public class GraphFragment extends Fragment  {
             @Override
             public void run() {
                 series.resetData(values);
-                mHandler.postDelayed(this, 300);
+                mHandler.postDelayed(this, 1000);
             }
         };
-        mHandler.postDelayed(mTimer1, 300);
+        mHandler.postDelayed(mTimer1, 1000);
 
     }
 

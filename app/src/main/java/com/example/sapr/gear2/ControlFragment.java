@@ -347,7 +347,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                     if (status_update == 0) {
                                         imitatorView.setText(imitator_string);
                                         if (g_listener != null) {
-                                            g_listener.addSeries(param_damp);
+                                            g_listener.addSeries(pressure);
                                         }
                                     } else {
                                         status_update = 0;
