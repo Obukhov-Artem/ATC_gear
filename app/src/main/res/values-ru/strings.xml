@@ -17,4 +17,6 @@
     <string name="temp_text">Предельная температура</string>
     <string name="synchro">Cинхронизация</string>
     <string name="synchro_repeat">Повторить</string>
+    <string name="db_check_text">Запись в базу</string>
+    <string name="username">Имя пользователя</string>
 </resources>

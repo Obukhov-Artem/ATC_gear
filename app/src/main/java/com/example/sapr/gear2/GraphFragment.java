@@ -19,15 +19,16 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class GraphFragment extends Fragment  {
+public class GraphFragment extends Fragment {
 
     private GraphView graph;
     private LineGraphSeries<DataPoint> series;
     DataPoint[] values;
-    private int data_num=0;
+    private int data_num = 0;
     private final Handler mHandler = new Handler();
     private Runnable mTimer1;
     private int count = 50;
+
     public GraphFragment() {
         // Required empty public constructor
     }
@@ -37,10 +38,10 @@ public class GraphFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View layout= inflater.inflate(R.layout.fragment_graph, container, false);
+        View layout = inflater.inflate(R.layout.fragment_graph, container, false);
         data_num = 0;
         values = new DataPoint[count];
-        for (int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             DataPoint v = new DataPoint(0, 0);
             values[i] = v;
         }
@@ -60,21 +61,24 @@ public class GraphFragment extends Fragment  {
         graph.addSeries(series);
 
 
-        Log.d("graph","start");
+        Log.d("graph", "start");
+
+        if (savedInstanceState != null) {
+        }
+
         return layout;
     }
 
     public void addSeries(float data) {
         DataPoint v = new DataPoint(data_num, data);
-        for (int i=0; i<count-1; i++) {
-            values[i] = values[i+1];
+        for (int i = 0; i < count - 1; i++) {
+            values[i] = values[i + 1];
         }
-        series.appendData(v,true,count);
-        values[count-1] = v;
+        series.appendData(v, true, count);
+        values[count - 1] = v;
 
-        data_num ++;
+        data_num++;
     }
-
 
 
     @Override
@@ -96,7 +100,6 @@ public class GraphFragment extends Fragment  {
         mHandler.removeCallbacks(mTimer1);
         super.onPause();
     }
-
 
 
 }

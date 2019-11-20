@@ -73,7 +73,7 @@ public class UDPHelper extends Thread {
                 socket.receive(packet);
                 byte[] data = packet.getData();
                 int status = data[0];
-                Log.d("STATUS", String.valueOf(status));
+                //Log.d("STATUS", String.valueOf(status));
                 if (status == 0) {
 
                     int temp_arz = (((data[1] & 0xFF) * 256) + (data[2] & 0xC0)) / 64;
