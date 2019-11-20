@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,13 +38,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Values.put("DESCRIPTION", description);
         Values.put("TIME_VALUE", dateFormat.format(date));
         Values.put("TEMPERATURE", temp_value);
-        Values.put("PRESSURE", temp_value);
-        Values.put("TEMPERATURE_INNER", temp_value);
-        Values.put("PULSE", temp_value);
-        Values.put("PARAM_TEMP", temp_value);
-        Values.put("PARAM_DAMPER", temp_value);
-        Values.put("PARAM_TEMP_LIMIT", temp_value);
+        Values.put("PRESSURE", pressure_value);
+        Values.put("TEMPERATURE_INNER", inner_temp_value);
+        Values.put("PULSE", pulse);
+        Values.put("PARAM_TEMP", param_temp);
+        Values.put("PARAM_DAMPER", param_damp);
+        Values.put("PARAM_TEMP_LIMIT", im_temp_max);
         db.insert("TRAINING", null, Values);
+        Log.d("db_ok", String.valueOf(name)+String.valueOf(description)
+                +String.valueOf(dateFormat.format(date))+String.valueOf(temp_value)
+                +String.valueOf(pressure_value)+String.valueOf(inner_temp_value)
+                +String.valueOf(pulse)+String.valueOf(param_temp)
+                +String.valueOf(param_damp)+String.valueOf(im_temp_max) );
     }
 
     private void updateMyDatabase(SQLiteDatabase db, int oldVersion, int newVersion) {
