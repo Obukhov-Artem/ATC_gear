@@ -50,6 +50,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 +String.valueOf(pressure_value)+String.valueOf(inner_temp_value)
                 +String.valueOf(pulse)+String.valueOf(param_temp)
                 +String.valueOf(param_damp)+String.valueOf(im_temp_max) );
+
+
     }
 
     private void updateMyDatabase(SQLiteDatabase db, int oldVersion, int newVersion) {

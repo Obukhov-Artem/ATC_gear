@@ -24,6 +24,9 @@ public class GraphFragment extends Fragment {
     private GraphView graph;
     private LineGraphSeries<DataPoint> series;
     DataPoint[] values;
+    double[] x;
+    double[] y;
+
     private int data_num = 0;
     private final Handler mHandler = new Handler();
     private Runnable mTimer1;
@@ -40,6 +43,8 @@ public class GraphFragment extends Fragment {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_graph, container, false);
         data_num = 0;
+        x = new double[count];
+        y = new double[count];
         values = new DataPoint[count];
         for (int i = 0; i < count; i++) {
             DataPoint v = new DataPoint(0, 0);
@@ -64,6 +69,13 @@ public class GraphFragment extends Fragment {
         Log.d("graph", "start");
 
         if (savedInstanceState != null) {
+            data_num = savedInstanceState.getInt("data_num");
+            x = savedInstanceState.getDoubleArray("x");
+            y = savedInstanceState.getDoubleArray("y");
+            for (int i = 0; i < count; i++) {
+                values[i] = new DataPoint(x[i],y[i]);
+            }
+            series.resetData(values);
         }
 
         return layout;
@@ -71,6 +83,9 @@ public class GraphFragment extends Fragment {
 
     public void addSeries(float data) {
         DataPoint v = new DataPoint(data_num, data);
+        if(data_num ==0){
+            Log.d("ds","gh");
+        }
         for (int i = 0; i < count - 1; i++) {
             values[i] = values[i + 1];
         }
@@ -100,6 +115,16 @@ public class GraphFragment extends Fragment {
         mHandler.removeCallbacks(mTimer1);
         super.onPause();
     }
-
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        for (int i = 0; i < count ; i++) {
+            x[i] = values[i].getX();
+            y[i] = values[i].getY();
+        }
+        savedInstanceState.putInt("data_num",data_num);
+        savedInstanceState.putDoubleArray("x",x);
+        savedInstanceState.putDoubleArray("y",y);
+    }
 
 }
