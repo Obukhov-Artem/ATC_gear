@@ -41,7 +41,9 @@ public class GraphFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         View layout = inflater.inflate(R.layout.fragment_graph, container, false);
+        setRetainInstance(true);
         data_num = 0;
         x = new double[count];
         y = new double[count];
@@ -56,13 +58,13 @@ public class GraphFragment extends Fragment {
         series.setDrawDataPoints(true);
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinY(-500);
-        graph.getViewport().setMaxY(500);
+        graph.getViewport().setMinY(-600);
+        graph.getViewport().setMaxY(600);
 
         graph.getViewport().setMinX(0);
         graph.getViewport().setMaxX(count);
-        graph.getViewport().setScalable(true);
-        graph.getViewport().setScalableY(true);
+        //graph.getViewport().setScalable(true);
+        //graph.getViewport().setScalableY(true);
         graph.addSeries(series);
 
 
@@ -86,9 +88,14 @@ public class GraphFragment extends Fragment {
         if(data_num ==0){
             Log.d("ds","gh");
         }
-        for (int i = 0; i < count - 1; i++) {
-            values[i] = values[i + 1];
+        try {
+            for (int i = 0; i < count - 1; i++) {
+                values[i] = values[i + 1];
+            }
+        }catch (NullPointerException e){
+            Log.d("values",String.valueOf(values));
         }
+
         series.appendData(v, true, count);
         values[count - 1] = v;
 

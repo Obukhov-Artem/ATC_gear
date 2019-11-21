@@ -48,6 +48,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private TextView imitatorView;
     private TextView tempView;
     private EditText username;
+    private EditText decription;
     private CheckBox flagDB;
 
     private static final String LOG_TAG = "MyHeart";
@@ -121,6 +122,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        setRetainInstance(true);
         layout = inflater.inflate(R.layout.fragment_control, container, false);
         pulse_string = getResources().getString(R.string.pulse);
         control_imitator = new byte[]{0, 0, 0};
@@ -129,6 +131,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
         dampView = (TextView) layout.findViewById(R.id.damper_text);
         tempView = (TextView) layout.findViewById(R.id.temp_text);
         username = (EditText) layout.findViewById(R.id.userName);
+        decription = (EditText) layout.findViewById(R.id.decription);
         flagDB = (CheckBox) layout.findViewById(R.id.flagDB);
         imitatorView = (TextView) layout.findViewById(R.id.imitator);
         Log.d(LOG_TAG, "start app");
@@ -599,10 +602,11 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             try {
                 if (flagDB.isChecked()) {
                     db = dh.getWritableDatabase();
-                    dh.insertData(db, String.valueOf(username.getText()), "testing",
+                    dh.insertData(db, String.valueOf(username.getText()), String.valueOf(decription.getText()),
                             temperature, pressure, inner_temp,
                             0, param_temp, param_damp, im_temp_max);
                     db.close();
+                    dh.close();
                 }
                 return true;
             } catch (SQLiteException e) {

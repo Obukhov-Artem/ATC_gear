@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">gear2</string>
+    <string name="page_control">Control Panel</string>
+    <string name="page_graph">Graphics</string>
+    <string name="page_base">Database</string>
     <string name="pulse">Pulse</string>
     <string name="heat">Heating</string>
     <string name="heat_start">Heating start</string>

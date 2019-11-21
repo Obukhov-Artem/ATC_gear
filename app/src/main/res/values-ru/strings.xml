@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Пульт 2</string>
+    <string name="page_control">Панель управления</string>
+    <string name="page_graph">Графики</string>
+    <string name="page_base">База данных</string>
     <string name="pulse">Пульс</string>
     <string name="start">Старт</string>
     <string name="heat_start">Нагрев начался</string>
