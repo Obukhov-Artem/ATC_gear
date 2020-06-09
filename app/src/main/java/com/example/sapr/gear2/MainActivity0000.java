@@ -323,7 +323,7 @@ public class MainActivity0000 extends AppCompatActivity implements SensorEventLi
                 try {
                     udp = new UDPHelper(getApplicationContext(), new UDPHelper.BroadcastListener() {
                         @Override
-                        public void onReceive(int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp, int im_damper, int im_max_temp) {
+                        public void onReceive(int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp, int im_damper, int im_max_temp, int volume) {
                             if (status == 1) {
                                 status_update = 1;
 

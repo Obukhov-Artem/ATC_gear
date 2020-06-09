@@ -2,6 +2,7 @@ package com.example.sapr.gear2;
 
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -15,12 +16,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -28,7 +31,7 @@ import android.widget.Toast;
  * A simple {@link Fragment} subclass.
  */
 public class BaseFragment extends Fragment {
-
+    public static final String EXTRA_MESSAGE = "id";
 
     private EditText username;
     private EditText description;
@@ -39,6 +42,7 @@ public class BaseFragment extends Fragment {
     DatabaseHelper dh;
     private Cursor cursor;
     SimpleCursorAdapter listAdapter;
+
     public BaseFragment() {
         // Required empty public constructor
     }
@@ -62,6 +66,22 @@ public class BaseFragment extends Fragment {
                 new UpdateBaseTask().execute();
             }
         });
+
+        AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> listView,
+                                    View itemView,
+                                    int position,
+                                    long id) {
+                TextView c = (TextView) itemView.findViewById(R.id.item_ID);
+                int id_text = Integer.parseInt(c.getText().toString());
+                Intent intent = new Intent(getActivity(), BaseElement.class);
+                intent.putExtra(BaseElement.EXTRA_MESSAGE, id_text);
+                startActivity(intent);
+
+            }
+
+        };
+        listData.setOnItemClickListener(itemClickListener);
         return layout;
     }
 
@@ -102,11 +122,11 @@ public class BaseFragment extends Fragment {
                         null,
                         select_filter, select_value, null, null, "_id DESC");
                 listAdapter = new SimpleCursorAdapter(getActivity(),
-                            R.layout.data_item,
-                            cursor,
-                            new String[]{"_id", "NAME", "DESCRIPTION", "TIME_VALUE", "TEMPERATURE", "PRESSURE", "TEMPERATURE_INNER", "PULSE", "PARAM_TEMP", "PARAM_DAMPER", "PARAM_TEMP_LIMIT"},
-                            new int[]{R.id.item_ID, R.id.item_NAME, R.id.item_DESCRIPTION, R.id.item_TIME_VALUE, R.id.item_TEMPERATURE, R.id.item_TEMPERATURE_INNER, R.id.item_PULSE, R.id.item_PARAM_TEMP, R.id.item_PARAM_DAMPER, R.id.item_PARAM_TEMP_LIMIT},
-                            0);
+                        R.layout.data_item,
+                        cursor,
+                        new String[]{"_id", "NAME", "DESCRIPTION", "TIME_VALUE", "TEMPERATURE", "PRESSURE", "SPIROGRAM", "TEMPERATURE_INNER", "PULSE", "PARAM_TEMP", "PARAM_DAMPER", "PARAM_TEMP_LIMIT"},
+                        new int[]{R.id.item_ID, R.id.item_NAME, R.id.item_DESCRIPTION, R.id.item_TIME_VALUE, R.id.item_TEMPERATURE, R.id.item_TEMPERATURE_INNER, R.id.item_PULSE, R.id.item_PARAM_TEMP, R.id.item_PARAM_DAMPER, R.id.item_PARAM_TEMP_LIMIT},
+                        0);
 
 
                 return true;

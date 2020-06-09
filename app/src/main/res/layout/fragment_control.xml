@@ -39,7 +39,7 @@
                     android:ems="8"
                     android:layout_weight="1"
                     android:inputType="textPersonName"
-                    android:text="test" />
+                    android:text="Комментарий" />
 
                 <CheckBox
                     android:id="@+id/flagDB"

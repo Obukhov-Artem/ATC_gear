@@ -29,10 +29,10 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -61,6 +61,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
 
     private int temperature;
     private int pressure;
+    private float spirogram=0;
     private int inner_temp;
     private int param_temp = 0;
     private int param_damp = 0;
@@ -70,6 +71,11 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private int im_temp_max = 70;
     int mHeartRate;
     private int data_num = 0;
+    private float tvolume;
+    private int status_null = 0;
+    private int d_current = 0;
+    private int d_last = 0;
+
 
     private Button btnStart;
     private Button btnPause;
@@ -86,7 +92,6 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private GraphListener g_listener;
     SQLiteDatabase db;
     DatabaseHelper dh;
-
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
 
@@ -153,6 +158,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
         if (savedInstanceState != null) {
             temperature = savedInstanceState.getInt("temperature");
             pressure = savedInstanceState.getInt("pressure");
+            spirogram = savedInstanceState.getFloat("spirogram");
             inner_temp = savedInstanceState.getInt("inner_temp");
             dampView.setText(damp_string + String.format(" - %d ", savedInstanceState.getInt("damper")) + "%");
             damper.setProgress(savedInstanceState.getInt("damper"));
@@ -190,7 +196,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                     if (flagDB.isChecked()) {
                         mTimer = new Timer();
                         mMyTimerTask = new MyTimerTask();
-                        mTimer.schedule(mMyTimerTask, 1000, 1000);
+                        mTimer.schedule(mMyTimerTask, 20, 20);
                     } else {
                         if (mTimer != null) {
                             mTimer.cancel();
@@ -329,7 +335,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             Log.d("ERROR", "Not connection");
             View id_l = layout.findViewById(R.id.control_layout_main);
             Log.d("View id_l", String.valueOf(id_l));
-            Snackbar snackbar = Snackbar.make(id_l, text, duration);
+            Snackbar snackbar = Snackbar.make(layout, text, duration);
             snackbar.setAction(getResources().getString(R.string.synchro_repeat), new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -361,6 +367,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
         savedInstanceState.putByte("c3", control_imitator[2]);
         savedInstanceState.putInt("temperature", temperature);
         savedInstanceState.putInt("pressure", pressure);
+        savedInstanceState.putFloat("spirogram", spirogram);
         savedInstanceState.putInt("inner_temp", inner_temp);
         savedInstanceState.putInt("damper", damper.getProgress());
         savedInstanceState.putInt("heatStart", heatStart.getVisibility());
@@ -385,7 +392,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 try {
                     udp = new UDPHelper(getActivity().getApplicationContext(), new UDPHelper.BroadcastListener() {
                         @Override
-                        public void onReceive(final int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp, int im_damper, int im_max_temp) {
+                        public void onReceive(final int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp, int im_damper, int im_max_temp, int volume) {
                             if (status == 1) {
                                 status_update = 1;
                                 status_udp = 0;
@@ -395,6 +402,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                 temperature = Math.round(temp_value);
                                 pressure = Math.round(pressure_value);
                                 inner_temp = Math.round(inner_temp_value);
+                                tvolume = Math.round(volume);
                                 imitator_string = String.format(getResources().getString(R.string.imitator), temperature, pressure, inner_temp);
                                 //series.appendData(new DataPoint(data_num, pressure),true,100);
 
@@ -410,7 +418,28 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                     if (status_update == 0) {
                                         imitatorView.setText(imitator_string);
                                         if (g_listener != null) {
-                                            g_listener.addSeries(pressure);
+                                            if(status_null == 0){
+                                                status_null = 1;
+                                                d_current = pressure;
+                                                d_last = pressure;
+                                            }
+                                            if(status_null == 1){
+                                                d_last = d_current;
+                                                d_current = pressure;
+                                                int delta = d_current - d_last;
+                                                Log.d("DELTA D",String.valueOf(d_current)+" "+String.valueOf(d_last));
+                                                if(delta>0 && d_last<0&& d_current>=0){
+                                                    spirogram = 0;
+                                                }
+                                            }
+                                            //float spirogram = 0.0181f*pressure*pressure+0.0287f*pressure-0.377f;
+                                            float dp = (float)(pressure*0.01);
+                                            //spirogram = (int)(dp*dp*dp*0.1512f-3.3424f*dp*dp+41.657*dp);
+                                            int pnevmo = (int)(dp*dp*dp*0.1512f-3.3424f*dp*dp+41.657*dp);
+                                            if(tvolume>100) tvolume = 100;
+                                            spirogram += (float)(pnevmo*tvolume/(1000*60));
+                                            Log.d("VOLUME",String.valueOf(tvolume)+"   "+String.valueOf(spirogram));
+                                            g_listener.addSeries(pnevmo,spirogram);
                                         }
                                     } else {
                                         control_imitator[0] = (byte) param_temp;
@@ -588,12 +617,11 @@ public class ControlFragment extends Fragment implements SensorEventListener {
 
 
     private class UpdateBaseTask extends AsyncTask<Void, Void, Boolean> {
-        private ContentValues drinkValues;
+
 
         protected void onPreExecute() {
             CheckBox favorite = (CheckBox) layout.findViewById(R.id.flagDB);
-            drinkValues = new ContentValues();
-            drinkValues.put("FAVORITE", favorite.isChecked());
+
         }
 
         protected Boolean doInBackground(Void... voids) {
@@ -604,7 +632,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                     db = dh.getWritableDatabase();
                     dh.insertData(db, String.valueOf(username.getText()), String.valueOf(decription.getText()),
                             temperature, pressure, inner_temp,
-                            0, param_temp, param_damp, im_temp_max);
+                            0, param_temp, param_damp, im_temp_max,spirogram);
                     db.close();
                     dh.close();
                 }
