@@ -37,9 +37,12 @@ public class BaseElement extends AppCompatActivity {
                 "Время замера: ",
                 "Температура: ",
                 "Давление Па: ",
-                "Скорость л в мин.: ",
                 "Внутренняя температура: ",
-                "Пульс: "};
+                "Пульс: ",
+                "Параметры температуры: ",
+                "Параметры заслонки: ",
+                "Температурное ограничение: ",
+                "Скорость л в мин.: "};
         int id = intent.getIntExtra(EXTRA_MESSAGE, 0);
         try {
             DatabaseHelper dh = new DatabaseHelper(this);

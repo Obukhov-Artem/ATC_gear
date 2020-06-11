@@ -12,7 +12,7 @@ import java.util.Date;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "imitator"; // the name of our database
-    private static final int DB_VERSION = 3; // the version of the database
+    private static final int DB_VERSION = 1; // the version of the database
 
     DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -67,12 +67,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     + "PULSE REAL,"
                     + "PARAM_TEMP REAL,"
                     + "PARAM_DAMPER REAL,"
-                    + "PARAM_TEMP_LIMIT REAL);");
+                    + "PARAM_TEMP_LIMIT REAL, SPIROGRAM REAL);");
              }
-        if (oldVersion >= 1) {
-            db.execSQL("ALTER TABLE TRAINING ADD COLUMN SPIROGRAM REAL DEFAULT 0");
 
-             }
 
     }
 }

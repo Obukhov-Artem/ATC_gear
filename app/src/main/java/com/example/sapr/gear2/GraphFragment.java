@@ -89,17 +89,17 @@ public class GraphFragment extends Fragment {
         series2 = new LineGraphSeries<DataPoint>();
 
         series2.setDrawDataPoints(true);
-        //graph2.getViewport().setYAxisBoundsManual(true);
+        graph2.getViewport().setYAxisBoundsManual(true);
         graph2.getViewport().setXAxisBoundsManual(true);
-        graph2.getViewport().setMinY(-graph_max2);
-        graph2.getViewport().setMaxY(graph_max2);
+        graph2.getViewport().setMinY(-1);
+        graph2.getViewport().setMaxY(3);
 
         graph2.getViewport().setMinX(0);
         graph2.getViewport().setMaxX(count);
-        graph2.getViewport().setScrollable(true); // enables horizontal scrolling
-        graph2.getViewport().setScrollableY(true); // enables vertical scrolling
-        graph2.getViewport().setScalable(true); // enables horizontal zooming and scrolling
-        graph2.getViewport().setScalableY(true); // enables vertical zooming and scrolling
+        //graph2.getViewport().setScrollable(true); // enables horizontal scrolling
+        //graph2.getViewport().setScrollableY(true); // enables vertical scrolling
+        //graph2.getViewport().setScalable(true); // enables horizontal zooming and scrolling
+        //graph2.getViewport().setScalableY(true); // enables vertical zooming and scrolling
         graph2.addSeries(series2);
         graph2.getGridLabelRenderer().setTextSize(30);
         graph2.getGridLabelRenderer().setPadding(30);

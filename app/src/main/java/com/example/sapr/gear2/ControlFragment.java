@@ -416,6 +416,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                 @Override
                                 public void run() {
                                     if (status_update == 0) {
+                                        float k_spiro = 1;
                                         imitatorView.setText(imitator_string);
                                         if (g_listener != null) {
                                             if(status_null == 0){
@@ -431,13 +432,17 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                                 if(delta>0 && d_last<0&& d_current>=0){
                                                     spirogram = 0;
                                                 }
+                                                if(delta<0 && d_current<0){
+                                                    k_spiro = 0.5f;
+                                                }
                                             }
                                             //float spirogram = 0.0181f*pressure*pressure+0.0287f*pressure-0.377f;
                                             float dp = (float)(pressure*0.01);
                                             //spirogram = (int)(dp*dp*dp*0.1512f-3.3424f*dp*dp+41.657*dp);
                                             int pnevmo = (int)(dp*dp*dp*0.1512f-3.3424f*dp*dp+41.657*dp);
                                             if(tvolume>100) tvolume = 100;
-                                            spirogram += (float)(pnevmo*tvolume/(1000*60));
+                                            if(spirogram>-0.010)
+                                                spirogram += (float)(k_spiro*pnevmo*tvolume/(1000*60));
                                             Log.d("VOLUME",String.valueOf(tvolume)+"   "+String.valueOf(spirogram));
                                             g_listener.addSeries(pnevmo,spirogram);
                                         }
