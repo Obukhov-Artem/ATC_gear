@@ -62,6 +62,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private int temperature;
     private int pressure;
     private float spirogram=0;
+    private float[] vsd_m;
     private int inner_temp;
     private int param_temp = 0;
     private int param_damp = 0;
@@ -431,6 +432,8 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                                 Log.d("DELTA D",String.valueOf(d_current)+" "+String.valueOf(d_last));
                                                 if(delta>0 && d_last<0&& d_current>=0){
                                                     spirogram = 0;
+
+
                                                 }
                                                 if(delta<0 && d_current<0){
                                                     k_spiro = 0.5f;
@@ -441,10 +444,11 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                             //spirogram = (int)(dp*dp*dp*0.1512f-3.3424f*dp*dp+41.657*dp);
                                             int pnevmo = (int)(dp*dp*dp*0.1512f-3.3424f*dp*dp+41.657*dp);
                                             if(tvolume>100) tvolume = 100;
-                                            if(spirogram>-0.010)
-                                                spirogram += (float)(k_spiro*pnevmo*tvolume/(1000*60));
+                                            float d_spiro = (float)(k_spiro*pnevmo*tvolume/(1000*60));
+                                            if(spirogram>-0.02)
+                                                spirogram += d_spiro;
                                             Log.d("VOLUME",String.valueOf(tvolume)+"   "+String.valueOf(spirogram));
-                                            g_listener.addSeries(pnevmo,spirogram);
+                                            g_listener.addSeries(pnevmo,spirogram,d_spiro, tvolume);
                                         }
                                     } else {
                                         control_imitator[0] = (byte) param_temp;
