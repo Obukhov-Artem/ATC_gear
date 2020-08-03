@@ -146,7 +146,7 @@ public class GraphFragment extends Fragment {
         return layout;
     }
 
-    public void addSeries(float data,float data2, float data3, float data4) {
+    public int addSeries(float data,float data2, float data3, float data4) {
         DataPoint v = new DataPoint(data_num, data);
         DataPoint v2 = new DataPoint(data_num, data2);
         if (data3>0)
@@ -186,6 +186,7 @@ public class GraphFragment extends Fragment {
         tt[count - 1] = data4;
 
         data_num++;
+        return 100-(int)TPA;
     }
 
 

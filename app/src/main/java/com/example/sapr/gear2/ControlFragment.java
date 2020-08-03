@@ -50,6 +50,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private EditText username;
     private EditText decription;
     private CheckBox flagDB;
+    private CheckBox flagAUTO;
 
     private static final String LOG_TAG = "MyHeart";
     private Drawable imgStart;
@@ -76,7 +77,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private int status_null = 0;
     private int d_current = 0;
     private int d_last = 0;
-
+    private boolean auto_dumper= false;
 
     private Button btnStart;
     private Button btnPause;
@@ -139,6 +140,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
         username = (EditText) layout.findViewById(R.id.userName);
         decription = (EditText) layout.findViewById(R.id.decription);
         flagDB = (CheckBox) layout.findViewById(R.id.flagDB);
+        flagAUTO = (CheckBox) layout.findViewById(R.id.flagAUTO);
         imitatorView = (TextView) layout.findViewById(R.id.imitator);
         Log.d(LOG_TAG, "start app");
         btnStart = (Button) layout.findViewById(R.id.btnStart);
@@ -206,7 +208,18 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 }
             }
         });
-
+        flagAUTO.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.flagAUTO) {
+                    if (flagAUTO.isChecked()) {
+                        auto_dumper = true;
+                    } else {
+                        auto_dumper = false;
+                    }
+                }
+            }
+        });
         if (btnStart.getVisibility() != View.GONE) {
             btnPause.setVisibility(Button.GONE);
             btnStart.setVisibility(Button.VISIBLE);
@@ -448,7 +461,18 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                             if(spirogram>-0.02)
                                                 spirogram += d_spiro;
                                             Log.d("VOLUME",String.valueOf(tvolume)+"   "+String.valueOf(spirogram));
-                                            g_listener.addSeries(pnevmo,spirogram,d_spiro, tvolume);
+                                            int new_dump = g_listener.addSeries(pnevmo,spirogram,d_spiro, tvolume);
+                                            if ((new_dump != param_damp) && (auto_dumper == true)){
+                                            param_damp = new_dump;
+                                            control_imitator[0] = (byte) param_temp;
+                                            control_imitator[1] = (byte) param_damp;
+                                            control_imitator[2] = (byte) im_temp_max;
+                                            dampView.setText(damp_string + String.format(" - %d ", param_damp) + "%");
+                                            damper.setProgress(param_damp);
+                                            damper_temp.setProgress((int) ((im_temp_max - 30) * 2.5));
+                                            status_update = 0;
+                                            status_udp = 0;
+                                            startSend();}
                                         }
                                     } else {
                                         control_imitator[0] = (byte) param_temp;

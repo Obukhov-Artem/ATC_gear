@@ -15,7 +15,7 @@ import static java.lang.Thread.sleep;
 
 
 interface GraphListener {
-    void addSeries(float data,float data2,float data3,float data4);
+    int addSeries(float data,float data2,float data3,float data4);
 };
 
 
@@ -42,10 +42,11 @@ public class MainActivity extends AppCompatActivity implements GraphListener {
     }
 
     @Override
-    public void addSeries(float data,float data2,float data3,float data4) {
+    public int addSeries(float data,float data2,float data3,float data4) {
         if (GF != null) {
-            GF.addSeries(data,data2,data3,data4);
+            return GF.addSeries(data,data2,data3,data4);
         }
+        return 0;
     }
 
 
