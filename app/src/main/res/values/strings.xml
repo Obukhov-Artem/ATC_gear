@@ -22,6 +22,7 @@
 
     <string name="db_check_text">Write to DB</string>
     <string name="username">User</string>
+    <string name="page_graph2">Pulse</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

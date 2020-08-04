@@ -92,6 +92,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private Thread udpConnect3;
     private View layout;
     private GraphListener g_listener;
+    private GraphPulseListener pulse_listener;
     SQLiteDatabase db;
     DatabaseHelper dh;
     private Timer mTimer;
@@ -405,6 +406,14 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             public void run() {
                 try {
                     udp = new UDPHelper(getActivity().getApplicationContext(), new UDPHelper.BroadcastListener() {
+
+                        @Override
+                        public void onReceivePulse(int pulse) {
+
+                            int t = pulse_listener.addSeries2(pulse,0,0,0);
+
+                        }
+
                         @Override
                         public void onReceive(final int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp, int im_damper, int im_max_temp, int volume) {
                             if (status == 1) {
@@ -433,46 +442,47 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                         float k_spiro = 1;
                                         imitatorView.setText(imitator_string);
                                         if (g_listener != null) {
-                                            if(status_null == 0){
+                                            if (status_null == 0) {
                                                 status_null = 1;
                                                 d_current = pressure;
                                                 d_last = pressure;
                                             }
-                                            if(status_null == 1){
+                                            if (status_null == 1) {
                                                 d_last = d_current;
                                                 d_current = pressure;
                                                 int delta = d_current - d_last;
-                                                Log.d("DELTA D",String.valueOf(d_current)+" "+String.valueOf(d_last));
-                                                if(delta>0 && d_last<0&& d_current>=0){
+                                                Log.d("DELTA D", String.valueOf(d_current) + " " + String.valueOf(d_last));
+                                                if (delta > 0 && d_last < 0 && d_current >= 0) {
                                                     spirogram = 0;
 
 
                                                 }
-                                                if(delta<0 && d_current<0){
+                                                if (delta < 0 && d_current < 0) {
                                                     k_spiro = 0.5f;
                                                 }
                                             }
                                             //float spirogram = 0.0181f*pressure*pressure+0.0287f*pressure-0.377f;
-                                            float dp = (float)(pressure*0.01);
+                                            float dp = (float) (pressure * 0.01);
                                             //spirogram = (int)(dp*dp*dp*0.1512f-3.3424f*dp*dp+41.657*dp);
-                                            int pnevmo = (int)(dp*dp*dp*0.1512f-3.3424f*dp*dp+41.657*dp);
-                                            if(tvolume>100) tvolume = 100;
-                                            float d_spiro = (float)(k_spiro*pnevmo*tvolume/(1000*60));
-                                            if(spirogram>-0.02)
+                                            int pnevmo = (int) (dp * dp * dp * 0.1512f - 3.3424f * dp * dp + 41.657 * dp);
+                                            if (tvolume > 100) tvolume = 100;
+                                            float d_spiro = (float) (k_spiro * pnevmo * tvolume / (1000 * 60));
+                                            if (spirogram > -0.02)
                                                 spirogram += d_spiro;
-                                            Log.d("VOLUME",String.valueOf(tvolume)+"   "+String.valueOf(spirogram));
-                                            int new_dump = g_listener.addSeries(pnevmo,spirogram,d_spiro, tvolume);
-                                            if ((new_dump != param_damp) && (auto_dumper == true)){
-                                            param_damp = new_dump;
-                                            control_imitator[0] = (byte) param_temp;
-                                            control_imitator[1] = (byte) param_damp;
-                                            control_imitator[2] = (byte) im_temp_max;
-                                            dampView.setText(damp_string + String.format(" - %d ", param_damp) + "%");
-                                            damper.setProgress(param_damp);
-                                            damper_temp.setProgress((int) ((im_temp_max - 30) * 2.5));
-                                            status_update = 0;
-                                            status_udp = 0;
-                                            startSend();}
+                                            Log.d("VOLUME", String.valueOf(tvolume) + "   " + String.valueOf(spirogram));
+                                            int new_dump = g_listener.addSeries(pnevmo, spirogram, d_spiro, tvolume);
+                                            if ((new_dump != param_damp) && (auto_dumper == true)) {
+                                                param_damp = new_dump;
+                                                control_imitator[0] = (byte) param_temp;
+                                                control_imitator[1] = (byte) param_damp;
+                                                control_imitator[2] = (byte) im_temp_max;
+                                                dampView.setText(damp_string + String.format(" - %d ", param_damp) + "%");
+                                                damper.setProgress(param_damp);
+                                                damper_temp.setProgress((int) ((im_temp_max - 30) * 2.5));
+                                                status_update = 0;
+                                                status_udp = 0;
+                                                startSend();
+                                            }
                                         }
                                     } else {
                                         control_imitator[0] = (byte) param_temp;

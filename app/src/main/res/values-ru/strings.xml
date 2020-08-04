@@ -22,4 +22,9 @@
     <string name="synchro_repeat">Повторить</string>
     <string name="db_check_text">Запись в базу</string>
     <string name="username">Пользователь</string>
+    <string name="page_graph2">Пульс</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_base_element">BaseElement</string>
 </resources>

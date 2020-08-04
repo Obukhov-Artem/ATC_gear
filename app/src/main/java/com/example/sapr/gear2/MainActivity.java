@@ -18,10 +18,15 @@ interface GraphListener {
     int addSeries(float data,float data2,float data3,float data4);
 };
 
+interface GraphPulseListener {
+    int addSeries2(float data,float data2,float data3,float data4);
+};
 
-public class MainActivity extends AppCompatActivity implements GraphListener {
+
+public class MainActivity extends AppCompatActivity implements GraphListener,GraphPulseListener {
     private final ControlFragment CF = new ControlFragment();
     private final GraphFragment GF = new GraphFragment();
+    private final GraphFragment_pulse GFP = new GraphFragment_pulse();
     private final BaseFragment BF = new BaseFragment();
 
     @Override
@@ -34,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements GraphListener {
                 new SectionsPagerAdapter(getSupportFragmentManager());
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(pagerAdapter);
-        pager.setOffscreenPageLimit(3);
+        pager.setOffscreenPageLimit(4);
 
         //Attach the ViewPager to the TabLayout
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -48,6 +53,13 @@ public class MainActivity extends AppCompatActivity implements GraphListener {
         }
         return 0;
     }
+    @Override
+    public int addSeries2(float data,float data2,float data3,float data4) {
+        if (GF != null) {
+            return GFP.addSeries2(data,data2,data3,data4);
+        }
+        return 0;
+    }
 
 
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -57,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements GraphListener {
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
 
         @Override
@@ -68,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements GraphListener {
                 case 1:
                     return GF;
                 case 2:
+                    return GFP;
+                case 3:
                     return BF;
             }
             return null;
@@ -81,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements GraphListener {
                 case 1:
                     return getResources().getText(R.string.page_graph);
                 case 2:
+                    return getResources().getText(R.string.page_graph2);
+                case 3:
                     return getResources().getText(R.string.page_base);
             }
             return null;
