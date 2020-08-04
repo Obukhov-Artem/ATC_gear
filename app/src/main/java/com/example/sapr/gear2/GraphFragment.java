@@ -18,6 +18,8 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.util.Calendar;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,11 +42,14 @@ public class GraphFragment extends Fragment {
     private TextView vsd_text;
     private TextView vsd_text_pr;
     private Button vsd_reset;
+    Calendar c;
+    long start_time=0;
+    long end_time=0;
 
     private int data_num = 0;
     private final Handler mHandler = new Handler();
     private Runnable mTimer1;
-    private int count = 50;
+    private int count = 400;
     private int graph_max1 = 300;
     private float max_y1 = 0;
     private float max_y2 = 0;
@@ -61,7 +66,10 @@ public class GraphFragment extends Fragment {
 
         View layout = inflater.inflate(R.layout.fragment_graph, container, false);
         setRetainInstance(true);
+        c = Calendar.getInstance();
 
+        start_time = c.getTimeInMillis();
+        end_time = c.getTimeInMillis();
         vsd_text = (TextView) layout.findViewById(R.id.graph_VZD2);
         vsd_text_pr = (TextView) layout.findViewById(R.id.graph_VZD);
         vsd_reset = (Button) layout.findViewById(R.id.VSD_reset);
@@ -69,6 +77,8 @@ public class GraphFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 vsd = 0;
+                start_time = c.getTimeInMillis();
+                end_time = c.getTimeInMillis();
             }
         });
         data_num = 0;
@@ -147,8 +157,11 @@ public class GraphFragment extends Fragment {
     }
 
     public int addSeries(float data,float data2, float data3, float data4) {
-        DataPoint v = new DataPoint(data_num, data);
-        DataPoint v2 = new DataPoint(data_num, data2);
+
+        end_time = c.getTimeInMillis();
+        int cur_time = (int)((end_time-start_time)/1000);
+        DataPoint v = new DataPoint(cur_time, data);
+        DataPoint v2 = new DataPoint(cur_time, data2);
         if (data3>0)
             vsd += data3;
         double TPA;
@@ -159,23 +172,27 @@ public class GraphFragment extends Fragment {
             Log.d("ds","gh");
         }
         double sum_TPA = 0;
-        float sum_t = 0;
+        //float sum_t = 0;
         try {
             for (int i = 0; i < count - 1; i++) {
                 sum_TPA+=Math.abs(values2[i].getY());
-                sum_t+=Math.abs(tt[i]);
+                //sum_t+=Math.abs(tt[i]);
                 values[i] = values[i + 1];
                 values2[i] = values2[i + 1];
                 tt[i]=tt[i+1];
 
             }
             sum_TPA+=Math.abs(values2[count - 1].getY());
-            sum_t+=Math.abs(tt[count - 1]);
-            sum_t=sum_t/(1000*60);
-            sum_TPA = sum_TPA/count;
-            sum_TPA = 9*TPA/(sum_TPA/sum_t);
-            vsd_text_pr.setText("Прогноз ВЗД: "+String.valueOf((int)sum_TPA)+" мин.");
-        }catch (NullPointerException e){
+            //sum_t+=Math.abs(tt[count - 1]);
+            //sum_t=sum_t/(1000*60);
+            if (cur_time>60){
+                sum_TPA = 9*TPA/(sum_TPA/(cur_time/60));
+                vsd_text_pr.setText("Прогноз ВЗД: "+String.valueOf((int)sum_TPA)+" мин.");
+
+            }
+            //sum_TPA = sum_TPA/count;
+            //sum_TPA = 9*TPA/(sum_TPA/sum_t);
+            }catch (NullPointerException e){
             Log.d("values",String.valueOf(values));
         }
 
@@ -183,7 +200,7 @@ public class GraphFragment extends Fragment {
         series2.appendData(v2, true, count);
         values[count - 1] = v;
         values2[count - 1] = v2;
-        tt[count - 1] = data4;
+        //tt[count - 1] = data4;
 
         data_num++;
         return 100-(int)TPA;

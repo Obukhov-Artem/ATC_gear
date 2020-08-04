@@ -92,9 +92,9 @@ public class UDPHelper extends Thread {
                     temperature = temp_arz * 0.25f;
                     int pressure_raw = ((data[3] & 0xFF) << 8) + (data[4] & 0xFF);
 
-                    pressure = (((pressure_raw - 1024) * 500 * 2.0f) / 60000.0f) - 500;
-                    float k_pressure = 2.05f;
-                    pressure = pressure*k_pressure;
+                    pressure = (((pressure_raw - 1024) * 1000.0f) / 60000.0f) - 500;
+                    float k_pressure = 0.5f;
+                    pressure = k_pressure*pressure;
                     int temp_raw = ((data[5] & 0xFF) << 8) + (data[6] & 0xFF);
                     inner_temp = (temp_raw - 10214.0f) / 37.39f;
                     //Log.d("UDP_temperature",String.valueOf(temperature));
