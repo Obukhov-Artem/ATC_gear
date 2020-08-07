@@ -20,13 +20,11 @@ public class UDPHelper extends Thread {
     private BroadcastListener listener;
     private Context ctx;
     private DatagramSocket clientSocket = null;
-    private DatagramSocket socket2;
     private DatagramSocket socket;
     private static final int PORT_IM_IN = 3022;
     private static final int PORT_PC_IN = 3041;
     private static final int PORT_IM_OUT = 3021;//??? проверить получаем ли данные с имитатора
-    private static final int PORT_MY1 = 3041;
-    //private static final int PORT_MY1 = 3024;
+    private static final int PORT_MY1 = 3024;
     private static final int PORT_MY2 = 3025;
 
     public UDPHelper(Context ctx, BroadcastListener listener) throws IOException {
@@ -101,7 +99,9 @@ public class UDPHelper extends Thread {
                     inner_temp = (temp_raw - 10214.0f) / 37.39f;
                     //Log.d("UDP_temperature",String.valueOf(temperature));
                     //Log.d("UDP_pressure",String.valueOf(pressure));
-                    //Log.d("UDP_inner_temp",String.valueOf(inner_temp));
+                    //long im_time = ((data[7] & 0xFF) << 24) + ((data[8] & 0xFF))<< 16+ ((data[9] & 0xFF) << 8) + (data[10] & 0xFF);
+                    //int im_time2 = (int)(im_time/100);
+                    //Log.d("UDP_time",String.valueOf(im_time));
 
                     if(ms==0 && ms_last == 0){
                         Calendar c = Calendar.getInstance();
@@ -137,31 +137,10 @@ public class UDPHelper extends Thread {
             }
         }
         socket.close();
-        try {
-            socket2 = new DatagramSocket(PORT_PC_IN);
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-        while (!socket2.isClosed()) {
-            try {
-                byte[] buf = new byte[1024];
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                socket2.receive(packet);
-                byte[] data = packet.getData();
-                int pulse = data[0];
-                listener.onReceivePulse(pulse);
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        socket2.close();
     }
 
     public void end() {
         socket.close();
-        socket2.close();
         clientSocket.close();
     }
 
@@ -171,8 +150,6 @@ public class UDPHelper extends Thread {
 
     public interface BroadcastListener {
         public void onReceive(int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp, int im_damper, int im_max_temp,int volume);
-
-        public void onReceivePulse(int pulse);
 
     }
 

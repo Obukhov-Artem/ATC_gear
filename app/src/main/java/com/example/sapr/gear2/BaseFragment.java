@@ -1,16 +1,22 @@
 package com.example.sapr.gear2;
 
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.Fragment;
 
+import android.os.Environment;
 import android.util.AndroidException;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +32,11 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.opencsv.CSVWriter;
+
+import java.io.File;
+import java.io.FileWriter;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,6 +48,8 @@ public class BaseFragment extends Fragment {
     private EditText description;
     private View layout;
     private Button search;
+    private Button savecsv;
+    private Button deldb;
     private ListView listData;
     SQLiteDatabase db;
     DatabaseHelper dh;
@@ -54,6 +67,8 @@ public class BaseFragment extends Fragment {
         // Inflate the layout for this fragment
         layout = inflater.inflate(R.layout.fragment_base, container, false);
         search = (Button) layout.findViewById(R.id.Search_DB);
+        savecsv = (Button) layout.findViewById(R.id.SaveDB);
+        deldb = (Button) layout.findViewById(R.id.SaveDB);
         username = (EditText) layout.findViewById(R.id.user_filter);
         description = (EditText) layout.findViewById(R.id.decription_filter);
         listData = (ListView) layout.findViewById(R.id.list_data);
@@ -64,6 +79,20 @@ public class BaseFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 new UpdateBaseTask().execute();
+            }
+        });
+        deldb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dh.clear();
+            }
+        });
+        savecsv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selfPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                exportDB();
+                else Log.e("DB","error write file permission");
             }
         });
 
@@ -84,8 +113,59 @@ public class BaseFragment extends Fragment {
         listData.setOnItemClickListener(itemClickListener);
         return layout;
     }
+    public boolean selfPermissionGranted(String permission) {
+        // For Android < Android M, self permissions are always granted.
+        boolean result = true;
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // targetSdkVersion >= Android M, we can
+                // use Context#checkSelfPermission
+                result = getActivity().checkSelfPermission(permission)
+                        == PackageManager.PERMISSION_GRANTED;
+            } else {
+                // targetSdkVersion < Android M, we have to use PermissionChecker
+                result = PermissionChecker.checkSelfPermission(getActivity(), permission)
+                        == PermissionChecker.PERMISSION_GRANTED;
+            }
+        }
+
+        return result;
+    }
+    private void exportDB() {
+
+        File exportDir = new File(Environment.getExternalStorageDirectory(), "");
+        if (!exportDir.exists())
+        {
+            exportDir.mkdirs();
+        }
+
+        File file = new File(exportDir, "csvname.csv");
+        try
+        {
+            file.createNewFile();
+            CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
+            SQLiteDatabase db = dh.getReadableDatabase();
+            Cursor curCSV = db.rawQuery("SELECT * FROM TRAINING",null);
+            csvWrite.writeNext(curCSV.getColumnNames());
+            int i = 0;
+            while(curCSV.moveToNext())
+            {
+                //Which column you want to exprort
+                String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7), curCSV.getString(8), curCSV.getString(9), curCSV.getString(10), curCSV.getString(11)};
+                csvWrite.writeNext(arrStr);
+                Log.d("save",String.valueOf(i));
+                i++;
+            }
+            csvWrite.close();
+            curCSV.close();
+        }
+        catch(Exception sqlEx)
+        {
+            Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
+        }
+    }
     private class UpdateBaseTask extends AsyncTask<Void, Void, Boolean> {
 
         private String select_filter;
@@ -124,8 +204,8 @@ public class BaseFragment extends Fragment {
                 listAdapter = new SimpleCursorAdapter(getActivity(),
                         R.layout.data_item,
                         cursor,
-                        new String[]{"_id", "NAME", "DESCRIPTION", "TIME_VALUE", "TEMPERATURE", "PRESSURE", "SPIROGRAM", "TEMPERATURE_INNER", "PULSE", "PARAM_TEMP", "PARAM_DAMPER", "PARAM_TEMP_LIMIT"},
-                        new int[]{R.id.item_ID, R.id.item_NAME, R.id.item_DESCRIPTION, R.id.item_TIME_VALUE, R.id.item_TEMPERATURE, R.id.item_TEMPERATURE_INNER, R.id.item_PULSE, R.id.item_PARAM_TEMP, R.id.item_PARAM_DAMPER, R.id.item_PARAM_TEMP_LIMIT},
+                        new String[]{"_id", "NAME", "DESCRIPTION", "TIME_VALUE", "TEMPERATURE", "PRESSURE", "SPIROGRAM",  "PULSE", "VSD","TEMPERATURE_INNER", "PARAM_TEMP", "PARAM_DAMPER", "PARAM_TEMP_LIMIT"},
+                        new int[]{R.id.item_ID, R.id.item_NAME, R.id.item_DESCRIPTION, R.id.item_TIME_VALUE, R.id.item_TEMPERATURE, R.id.item_VSD, R.id.item_PULSE, R.id.item_TEMPERATURE_INNER,R.id.item_PARAM_TEMP, R.id.item_PARAM_DAMPER, R.id.item_PARAM_TEMP_LIMIT},
                         0);
 
 

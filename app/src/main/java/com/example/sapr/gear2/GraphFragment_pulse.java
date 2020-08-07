@@ -24,15 +24,15 @@ import java.util.Calendar;
  */
 public class GraphFragment_pulse extends Fragment {
 
-    private GraphView graph;
-    private LineGraphSeries<DataPoint> series;
-    DataPoint[] values;
-    double[] x;
-    double[] y;
+    private GraphView graph3;
+    private LineGraphSeries<DataPoint> series3;
+    private DataPoint[] values2;
+    private double[] x;
+    private double[] y;
 
-    Calendar c;
-    long start_time=0;
-    long end_time=0;
+    private Calendar c;
+    private long start_time=0;
+    private long end_time=0;
 
     private int data_num = 0;
     private final Handler mHandler = new Handler();
@@ -61,36 +61,36 @@ public class GraphFragment_pulse extends Fragment {
         x = new double[count];
 
 
-        values = new DataPoint[count];
+        values2 = new DataPoint[count];
 
         for (int i = 0; i < count; i++) {
             DataPoint v = new DataPoint(0, 0);
-            values[i] = v;
+            values2[i] = v;
         }
-        graph = (GraphView) layout.findViewById(R.id.graph2);
-        series = new LineGraphSeries<DataPoint>();
+        graph3 = (GraphView) layout.findViewById(R.id.graph2);
+        series3 = new LineGraphSeries<DataPoint>();
 
-        series.setDrawDataPoints(true);
+        series3.setDrawDataPoints(true);
         //graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinY(-graph_max1);
-        graph.getViewport().setMaxY(graph_max1);
-        graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(count);
-        graph.getViewport().setScrollable(true); // enables horizontal scrolling
-        graph.getViewport().setScrollableY(true); // enables vertical scrolling
-        graph.getViewport().setScalable(true); // enables horizontal zooming and scrolling
-        graph.getViewport().setScalableY(true); // enables vertical zooming and scrolling
-        //graph.getViewport().setScalable(true);
-        //graph.getViewport().setScalableY(true);
-        graph.getGridLabelRenderer().setTextSize(20);
-        graph.getGridLabelRenderer().setPadding(40);
-        graph.addSeries(series);
+        graph3.getViewport().setXAxisBoundsManual(true);
+        graph3.getViewport().setMinY(-5);
+        graph3.getViewport().setMaxY(200);
+        graph3.getViewport().setMinX(-5);
+        graph3.getViewport().setMaxX(60);
+        graph3.getViewport().setScrollable(true); // enables horizontal scrolling
+        graph3.getViewport().setScrollableY(true); // enables vertical scrolling
+        graph3.getViewport().setScalable(false); // enables horizontal zooming and scrolling
+        graph3.getViewport().setScalableY(false); // enables vertical zooming and scrolling
+        //graph3.getViewport().setScalable(true);
+        //graph3.getViewport().setScalableY(true);
+        graph3.getGridLabelRenderer().setTextSize(20);
+        graph3.getGridLabelRenderer().setPadding(40);
+        graph3.addSeries(series3);
 
 
 
 
-        Log.d("graph", "start");
+        Log.d("graph3", "start2");
 
         if (savedInstanceState != null) {
             data_num = savedInstanceState.getInt("data_num");
@@ -98,10 +98,10 @@ public class GraphFragment_pulse extends Fragment {
             y = savedInstanceState.getDoubleArray("y");
 
             for (int i = 0; i < count; i++) {
-                values[i] = new DataPoint(x[i],y[i]);
+                values2[i] = new DataPoint(x[i],y[i]);
 
             }
-            series.resetData(values);
+            series3.resetData(values2);
         }
 
         return layout;
@@ -109,26 +109,37 @@ public class GraphFragment_pulse extends Fragment {
 
     public int addSeries2(float data,float data2, float data3, float data4) {
 
+        c = Calendar.getInstance();
         end_time = c.getTimeInMillis();
-        int cur_time = (int)((end_time-start_time)/1000);
-        DataPoint v = new DataPoint(cur_time, data);
+        float cur_time = (float)((end_time-start_time));
+        DataPoint v = new DataPoint(cur_time/1000, data);
+
+
 
         try {
             for (int i = 0; i < count - 1; i++) {
 
-                values[i] = values[i + 1];
+                values2[i] = values2[i + 1];
 
             }
 
-            }catch (NullPointerException e){
-            Log.d("values",String.valueOf(values));
+
+        if (series3 != null) {
+            series3.appendData(v, true, count);
+            values2[count - 1] = v;
+        }
+        else{
+
+            series3 = new LineGraphSeries<DataPoint>();
+            values2 = new DataPoint[count];
+            v = new DataPoint(cur_time/1000, 0);
+            series3.appendData(v, true, count);
+            values2[count - 1] = v;
         }
 
-        series.appendData(v, true, count);
-
-        values[count - 1] = v;
-
-
+        }catch (NullPointerException e){
+            Log.d("values2",String.valueOf(values2));
+        }
         data_num++;
         return 0;
     }
@@ -141,7 +152,7 @@ public class GraphFragment_pulse extends Fragment {
             @Override
             public void run() {
 
-                series.resetData(values);
+                series3.resetData(values2);
                 mHandler.postDelayed(this, 1000);
             }
         };
@@ -158,8 +169,8 @@ public class GraphFragment_pulse extends Fragment {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         for (int i = 0; i < count ; i++) {
-            x[i] = values[i].getX();
-            y[i] = values[i].getY();
+            x[i] = values2[i].getX();
+            y[i] = values2[i].getY();
         }
         savedInstanceState.putInt("data_num",data_num);
         savedInstanceState.putDoubleArray("x",x);

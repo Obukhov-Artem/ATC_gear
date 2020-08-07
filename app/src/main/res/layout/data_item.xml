@@ -61,7 +61,7 @@
         android:layout_height="wrap_content"
         android:text="-" />
     <TextView
-        android:id="@+id/item_TEMPERATURE_INNER"
+        android:id="@+id/item_VSD"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
@@ -76,6 +76,14 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
     android:text="-" />
+    <TextView
+        android:id="@+id/item_TEMPERATURE_INNER"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_width="wrap_content"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="-" />
     <TextView
         android:id="@+id/item_PARAM_TEMP"
         android:layout_marginLeft="5dp"

@@ -71,8 +71,8 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private int status_start = 0;
     private int status_udp = 1;
     private int im_temp_max = 70;
-    int mHeartRate;
-    private int data_num = 0;
+    int mHeartRate=0;
+    private int vsd = 0;
     private float tvolume;
     private int status_null = 0;
     private int d_current = 0;
@@ -86,13 +86,14 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private SeekBar damper;
     private SeekBar damper_temp;
     private UDPHelper udp;
+    private UDPHelper2 udp2;
     private byte[] control_imitator;
     private Thread udpConnect;
     private Thread udpConnect2;
     private Thread udpConnect3;
+    private Thread udpConnect4;
     private View layout;
     private GraphListener g_listener;
-    private GraphPulseListener pulse_listener;
     SQLiteDatabase db;
     DatabaseHelper dh;
     private Timer mTimer;
@@ -192,7 +193,16 @@ public class ControlFragment extends Fragment implements SensorEventListener {
 
 
     private void init_component() {
-
+        if (flagDB.isChecked()) {
+            mTimer = new Timer();
+            mMyTimerTask = new MyTimerTask();
+            mTimer.schedule(mMyTimerTask, 50, 50);
+        }
+        if (flagAUTO.isChecked()) {
+            auto_dumper = true;
+        } else {
+            auto_dumper = false;
+        }
         flagDB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -200,7 +210,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                     if (flagDB.isChecked()) {
                         mTimer = new Timer();
                         mMyTimerTask = new MyTimerTask();
-                        mTimer.schedule(mMyTimerTask, 20, 20);
+                        mTimer.schedule(mMyTimerTask, 50, 50);
                     } else {
                         if (mTimer != null) {
                             mTimer.cancel();
@@ -407,12 +417,6 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 try {
                     udp = new UDPHelper(getActivity().getApplicationContext(), new UDPHelper.BroadcastListener() {
 
-                        @Override
-                        public void onReceivePulse(int pulse) {
-
-                            int t = pulse_listener.addSeries2(pulse,0,0,0);
-
-                        }
 
                         @Override
                         public void onReceive(final int status, float temp_value, float pressure_value, float inner_temp_value, int im_temp, int im_damper, int im_max_temp, int volume) {
@@ -470,7 +474,9 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                             if (spirogram > -0.02)
                                                 spirogram += d_spiro;
                                             Log.d("VOLUME", String.valueOf(tvolume) + "   " + String.valueOf(spirogram));
-                                            int new_dump = g_listener.addSeries(pnevmo, spirogram, d_spiro, tvolume);
+                                            int[] new_values = g_listener.addSeries(pnevmo, spirogram, d_spiro, mHeartRate);
+                                            int new_dump = new_values[0];
+                                            vsd = new_values[1];
                                             if ((new_dump != param_damp) && (auto_dumper == true)) {
                                                 param_damp = new_dump;
                                                 control_imitator[0] = (byte) param_temp;
@@ -523,6 +529,39 @@ public class ControlFragment extends Fragment implements SensorEventListener {
         });
 
         udpConnect.start();
+
+        udpConnect4 = new Thread(new Runnable() {
+
+            boolean running;
+
+            @Override
+            public void run() {
+                try {
+                    udp2 = new UDPHelper2(getActivity().getApplicationContext(), new UDPHelper2.BroadcastListener() {
+                        @Override
+                        public void onReceive(final int pulse) {
+                            if (g_listener != null) {
+//                                int t = g_listener.addSeries2(pulse, 0, 0, 0);
+                                mHeartRate =pulse;
+                                pulseView.setText(pulse_string + ": " + String.format("%d", pulse));
+                            }
+
+                        }
+                    });
+                    udp2.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            public void end() {
+                udp2.end();
+            }
+        });
+
+        udpConnect4.start();
+
+
 
     }
 
@@ -638,6 +677,11 @@ public class ControlFragment extends Fragment implements SensorEventListener {
             udp.end();
             Log.d("onDestroy", String.valueOf(udp.status()));
         }
+        udpConnect4.interrupt();
+        if (udp2 != null) {
+            udp2.end();
+            Log.d("onDestroy", String.valueOf(udp2.status()));
+        }
         super.onDestroy();
     }
 
@@ -674,8 +718,8 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 if (flagDB.isChecked()) {
                     db = dh.getWritableDatabase();
                     dh.insertData(db, String.valueOf(username.getText()), String.valueOf(decription.getText()),
-                            temperature, pressure, inner_temp,
-                            0, param_temp, param_damp, im_temp_max,spirogram);
+                            temperature, pressure, vsd,
+                            mHeartRate,inner_temp, param_temp,param_damp, im_temp_max, spirogram);
                     db.close();
                     dh.close();
                 }

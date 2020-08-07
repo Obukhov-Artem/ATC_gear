@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.apache.commons.beanutils.PropertyUtilsBean;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -29,10 +31,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void insertData(SQLiteDatabase db, String name, String description,
-                                   float temp_value, float pressure_value, float inner_temp_value,
-                                   float pulse, float param_temp,float param_damp, float im_temp_max, float spirogram){
+                                   float temp_value, float pressure_value, float vsd,
+                                   float pulse,float inner_temp_value, float param_temp,float param_damp, float im_temp_max, float spirogram){
         ContentValues Values = new ContentValues();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
         Date date = new Date();
         Values.put("NAME", name);
         Values.put("DESCRIPTION", description);
@@ -40,8 +42,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Values.put("TEMPERATURE", temp_value);
         Values.put("PRESSURE", pressure_value);
         Values.put("SPIROGRAM", spirogram);
-        Values.put("TEMPERATURE_INNER", inner_temp_value);
+        Values.put("VSD", vsd);
         Values.put("PULSE", pulse);
+        Values.put("TEMPERATURE_INNER", inner_temp_value);
         Values.put("PARAM_TEMP", param_temp);
         Values.put("PARAM_DAMPER", param_damp);
         Values.put("PARAM_TEMP_LIMIT", im_temp_max);
@@ -54,6 +57,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     }
+    public void clear(){
+        SQLiteDatabase db2 = this.getReadableDatabase();
+        db2.delete("TRAINING", null, null);
+        db2.close();
+    }
 
     private void updateMyDatabase(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 1) {
@@ -63,8 +71,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     + "TIME_VALUE DATETIME,"
                     + "TEMPERATURE REAL,"
                     + "PRESSURE REAL,"
-                    + "TEMPERATURE_INNER REAL,"
                     + "PULSE REAL,"
+                    + "VSD REAL,"
+                    + "TEMPERATURE_INNER REAL,"
                     + "PARAM_TEMP REAL,"
                     + "PARAM_DAMPER REAL,"
                     + "PARAM_TEMP_LIMIT REAL, SPIROGRAM REAL);");

@@ -28,16 +28,20 @@ public class GraphFragment extends Fragment {
 
     private GraphView graph;
     private GraphView graph2;
+    private GraphView graph3;
     private LineGraphSeries<DataPoint> series;
     private LineGraphSeries<DataPoint> series2;
+    private LineGraphSeries<DataPoint> series3;
     DataPoint[] values;
     DataPoint[] values2;
+    DataPoint[] values3;
     double[] tt;
     double[] x;
     double[] y;
     double[] x2;
     double[] y2;
     double vsd=0;
+    int vsd_current=0;
 
     private TextView vsd_text;
     private TextView vsd_text_pr;
@@ -45,15 +49,17 @@ public class GraphFragment extends Fragment {
     Calendar c;
     long start_time=0;
     long end_time=0;
+    long period_start=0;
+    long period_time=0;
+    long time1=0;
+    long time2=0;
 
     private int data_num = 0;
     private final Handler mHandler = new Handler();
     private Runnable mTimer1;
-    private int count = 400;
+    private int count = 500;
     private int graph_max1 = 300;
-    private float max_y1 = 0;
-    private float max_y2 = 0;
-    private int graph_max2 = 10;
+    double sum_TPA = 0;
     public GraphFragment() {
         // Required empty public constructor
     }
@@ -69,7 +75,10 @@ public class GraphFragment extends Fragment {
         c = Calendar.getInstance();
 
         start_time = c.getTimeInMillis();
+        period_start = c.getTimeInMillis();
         end_time = c.getTimeInMillis();
+        time1 = c.getTimeInMillis();
+        time2 = c.getTimeInMillis();
         vsd_text = (TextView) layout.findViewById(R.id.graph_VZD2);
         vsd_text_pr = (TextView) layout.findViewById(R.id.graph_VZD);
         vsd_reset = (Button) layout.findViewById(R.id.VSD_reset);
@@ -77,8 +86,7 @@ public class GraphFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 vsd = 0;
-                start_time = c.getTimeInMillis();
-                end_time = c.getTimeInMillis();
+
             }
         });
         data_num = 0;
@@ -89,14 +97,16 @@ public class GraphFragment extends Fragment {
         y2 = new double[count];
         values = new DataPoint[count];
         values2 = new DataPoint[count];
+        values3 = new DataPoint[count];
         for (int i = 0; i < count; i++) {
             DataPoint v = new DataPoint(0, 0);
             values[i] = v;
             values2[i] = v;
-            tt[i]=0;
+            values3[i] = v;
         }
         graph = (GraphView) layout.findViewById(R.id.graph);
         series = new LineGraphSeries<DataPoint>();
+        sum_TPA = 0;
 
         series.setDrawDataPoints(true);
         //graph.getViewport().setYAxisBoundsManual(true);
@@ -104,7 +114,7 @@ public class GraphFragment extends Fragment {
         graph.getViewport().setMinY(-graph_max1);
         graph.getViewport().setMaxY(graph_max1);
         graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(count);
+        graph.getViewport().setMaxX(30);
         graph.getViewport().setScrollable(true); // enables horizontal scrolling
         graph.getViewport().setScrollableY(true); // enables vertical scrolling
         graph.getViewport().setScalable(true); // enables horizontal zooming and scrolling
@@ -122,11 +132,11 @@ public class GraphFragment extends Fragment {
         series2.setDrawDataPoints(true);
         graph2.getViewport().setYAxisBoundsManual(true);
         graph2.getViewport().setXAxisBoundsManual(true);
-        graph2.getViewport().setMinY(-1);
-        graph2.getViewport().setMaxY(5);
+        graph2.getViewport().setMinY(-0.5);
+        graph2.getViewport().setMaxY(3);
 
         graph2.getViewport().setMinX(0);
-        graph2.getViewport().setMaxX(count);
+        graph2.getViewport().setMaxX(30);
         //graph2.getViewport().setScrollable(true); // enables horizontal scrolling
         //graph2.getViewport().setScrollableY(true); // enables vertical scrolling
         //graph2.getViewport().setScalable(true); // enables horizontal zooming and scrolling
@@ -134,6 +144,26 @@ public class GraphFragment extends Fragment {
         graph2.addSeries(series2);
         graph2.getGridLabelRenderer().setTextSize(30);
         graph2.getGridLabelRenderer().setPadding(40);
+
+
+        graph3 = (GraphView) layout.findViewById(R.id.graph_3);
+        series3 = new LineGraphSeries<DataPoint>();
+
+        series3.setDrawDataPoints(true);
+        graph3.getViewport().setYAxisBoundsManual(true);
+        graph3.getViewport().setXAxisBoundsManual(true);
+        graph3.getViewport().setMinY(-30);
+        graph3.getViewport().setMaxY(200);
+
+        graph3.getViewport().setMinX(0);
+        graph3.getViewport().setMaxX(30);
+        graph3.getViewport().setScrollable(true); // enables horizontal scrolling
+        graph3.getViewport().setScrollableY(true); // enables vertical scrolling
+        //graph3.getViewport().setScalable(true); // enables horizontal zooming and scrolling
+        graph3.getViewport().setScalableY(true); // enables vertical zooming and scrolling
+        graph3.addSeries(series3);
+        graph3.getGridLabelRenderer().setTextSize(30);
+        graph3.getGridLabelRenderer().setPadding(40);
 
 
         Log.d("graph", "start");
@@ -156,12 +186,17 @@ public class GraphFragment extends Fragment {
         return layout;
     }
 
-    public int addSeries(float data,float data2, float data3, float data4) {
+    public int[] addSeries(float data,float data2, float data3, float data4) {
 
+        c = Calendar.getInstance();
         end_time = c.getTimeInMillis();
-        int cur_time = (int)((end_time-start_time)/1000);
-        DataPoint v = new DataPoint(cur_time, data);
-        DataPoint v2 = new DataPoint(cur_time, data2);
+        time1 = c.getTimeInMillis();
+        float cur_time = (float)((end_time-start_time));
+        float delta_time = (float)(time1-time2)/1000;
+        period_time = ((end_time-period_start))/1000;
+        DataPoint v = new DataPoint(cur_time/1000, data);
+        DataPoint v2 = new DataPoint(cur_time/1000, data2);
+        DataPoint v3 = new DataPoint(cur_time/1000, data4);
         if (data3>0)
             vsd += data3;
         double TPA;
@@ -171,39 +206,46 @@ public class GraphFragment extends Fragment {
         if(data_num ==0){
             Log.d("ds","gh");
         }
-        double sum_TPA = 0;
         //float sum_t = 0;
         try {
             for (int i = 0; i < count - 1; i++) {
-                sum_TPA+=Math.abs(values2[i].getY());
-                //sum_t+=Math.abs(tt[i]);
+                //sum_TPA+=Math.abs(values2[i].getY())*delta_time;
                 values[i] = values[i + 1];
                 values2[i] = values2[i + 1];
-                tt[i]=tt[i+1];
+                values3[i] = values3[i + 1];
 
             }
-            sum_TPA+=Math.abs(values2[count - 1].getY());
-            //sum_t+=Math.abs(tt[count - 1]);
-            //sum_t=sum_t/(1000*60);
-            if (cur_time>60){
-                sum_TPA = 9*TPA/(sum_TPA/(cur_time/60));
+            //sum_TPA+=Math.abs(values2[count - 1].getY());
+
+            Log.d("time",String.valueOf(delta_time));
+            Log.d("sumTPA",String.valueOf(sum_TPA));
+            if (period_time>60){
+                sum_TPA = 9*TPA/(sum_TPA);
                 vsd_text_pr.setText("Прогноз ВЗД: "+String.valueOf((int)sum_TPA)+" мин.");
-
+                vsd_current = (int) sum_TPA;
+                period_time = 0;
+                period_start = c.getTimeInMillis();
+                sum_TPA = 0;
             }
-            //sum_TPA = sum_TPA/count;
-            //sum_TPA = 9*TPA/(sum_TPA/sum_t);
             }catch (NullPointerException e){
             Log.d("values",String.valueOf(values));
         }
 
         series.appendData(v, true, count);
         series2.appendData(v2, true, count);
+        series3.appendData(v3, true, count);
         values[count - 1] = v;
         values2[count - 1] = v2;
+
+        sum_TPA+=Math.abs(values2[count - 1].getY())*delta_time;
+        values3[count - 1] = v3;
+        time2 = time1;
         //tt[count - 1] = data4;
 
         data_num++;
-        return 100-(int)TPA;
+        int res1 = 100-(int)TPA;
+        return new int[] {res1, vsd_current};
+        //return 100-(int)TPA;
     }
 
 
@@ -216,10 +258,11 @@ public class GraphFragment extends Fragment {
 
                 series.resetData(values);
                 series2.resetData(values2);
+                series3.resetData(values3);
                 mHandler.postDelayed(this, 1000);
             }
         };
-        mHandler.postDelayed(mTimer1, 1000);
+        mHandler.postDelayed(mTimer1, 3000);
 
     }
 
@@ -231,17 +274,24 @@ public class GraphFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        for (int i = 0; i < count ; i++) {
-            x[i] = values[i].getX();
-            y[i] = values[i].getY();
-            x2[i] = values2[i].getX();
-            y2[i] = values2[i].getY();
+        try {
+            x = new double[count];
+            x = new double[count];
+            for (int i = 0; i < count; i++) {
+                x[i] = values[i].getX();
+                y[i] = values[i].getY();
+                x2[i] = values2[i].getX();
+                y2[i] = values2[i].getY();
+            }
+            savedInstanceState.putInt("data_num", data_num);
+            savedInstanceState.putDoubleArray("x", x);
+            savedInstanceState.putDoubleArray("y", y);
+            savedInstanceState.putDoubleArray("x2", x2);
+            savedInstanceState.putDoubleArray("y2", y2);
         }
-        savedInstanceState.putInt("data_num",data_num);
-        savedInstanceState.putDoubleArray("x",x);
-        savedInstanceState.putDoubleArray("y",y);
-        savedInstanceState.putDoubleArray("x2",x2);
-        savedInstanceState.putDoubleArray("y2",y2);
+        catch (Exception e){
+            Log.e("error","values");
+        }
     }
 
 }
