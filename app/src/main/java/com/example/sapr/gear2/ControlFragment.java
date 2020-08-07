@@ -78,7 +78,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
     private int d_current = 0;
     private int d_last = 0;
     private boolean auto_dumper= false;
-
+    private int pnevmo = 0;
     private Button btnStart;
     private Button btnPause;
     private Button heatStart;
@@ -468,7 +468,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                                             //float spirogram = 0.0181f*pressure*pressure+0.0287f*pressure-0.377f;
                                             float dp = (float) (pressure * 0.01);
                                             //spirogram = (int)(dp*dp*dp*0.1512f-3.3424f*dp*dp+41.657*dp);
-                                            int pnevmo = (int) (dp * dp * dp * 0.1512f - 3.3424f * dp * dp + 41.657 * dp);
+                                            pnevmo = (int) (dp * dp * dp * 0.1512f - 3.3424f * dp * dp + 41.657 * dp);
                                             if (tvolume > 100) tvolume = 100;
                                             float d_spiro = (float) (k_spiro * pnevmo * tvolume / (1000 * 60));
                                             if (spirogram > -0.02)
@@ -719,7 +719,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                     db = dh.getWritableDatabase();
                     dh.insertData(db, String.valueOf(username.getText()), String.valueOf(decription.getText()),
                             temperature, (float)pressure, (float)vsd,
-                            mHeartRate,inner_temp, param_temp,param_damp, im_temp_max, spirogram);
+                            mHeartRate,inner_temp, param_temp,param_damp, im_temp_max, spirogram, pnevmo);
                     db.close();
                     dh.close();
                 }

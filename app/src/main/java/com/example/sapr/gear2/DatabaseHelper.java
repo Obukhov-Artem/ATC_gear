@@ -32,7 +32,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void insertData(SQLiteDatabase db, String name, String description,
                                    float temp_value, float pressure_value, float vsd,
-                                   float pulse,float inner_temp_value, float param_temp,float param_damp, float im_temp_max, float spirogram){
+                                   float pulse,float inner_temp_value, float param_temp,float param_damp, float im_temp_max, float spirogram, float pnevmogram){
         ContentValues Values = new ContentValues();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
         Date date = new Date();
@@ -42,6 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Values.put("TEMPERATURE", temp_value);
         Values.put("PRESSURE", pressure_value);
         Values.put("SPIROGRAM", spirogram);
+        Values.put("PNEVMOGRAM", pnevmogram);
         Values.put("VSD", vsd);
         Values.put("PULSE", pulse);
         Values.put("TEMPERATURE_INNER", inner_temp_value);
@@ -68,10 +69,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     + "PRESSURE REAL,"
                     + "PULSE REAL,"
                     + "VSD REAL,"
+                    + "SPIROGRAM REAL,"
+                    + "PNEVMOGRAM REAL,"
                     + "TEMPERATURE_INNER REAL,"
                     + "PARAM_TEMP REAL,"
                     + "PARAM_DAMPER REAL,"
-                    + "PARAM_TEMP_LIMIT REAL, SPIROGRAM REAL);");
+                    + "PARAM_TEMP_LIMIT REAL);");
              }
 
 

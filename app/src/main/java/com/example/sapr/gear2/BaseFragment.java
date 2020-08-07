@@ -154,7 +154,7 @@ public class BaseFragment extends Fragment {
             while(curCSV.moveToNext())
             {
                 //Which column you want to exprort
-                String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7), curCSV.getString(8), curCSV.getString(9), curCSV.getString(10), curCSV.getString(11)};
+                String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4), curCSV.getString(5), curCSV.getString(6), curCSV.getString(7), curCSV.getString(8), curCSV.getString(9), curCSV.getString(10), curCSV.getString(11), curCSV.getString(12), curCSV.getString(13)};
                 csvWrite.writeNext(arrStr);
                 Log.d("save",String.valueOf(i));
                 i++;
@@ -208,8 +208,8 @@ public class BaseFragment extends Fragment {
                 listAdapter = new SimpleCursorAdapter(getActivity(),
                         R.layout.data_item,
                         cursor,
-                        new String[]{"_id", "NAME", "DESCRIPTION", "TIME_VALUE", "TEMPERATURE", "PRESSURE", "SPIROGRAM",  "PULSE", "VSD","TEMPERATURE_INNER", "PARAM_TEMP", "PARAM_DAMPER", "PARAM_TEMP_LIMIT"},
-                        new int[]{R.id.item_ID, R.id.item_NAME, R.id.item_DESCRIPTION, R.id.item_TIME_VALUE, R.id.item_TEMPERATURE, R.id.item_PRESSURE, R.id.item_SPIROGRAM, R.id.item_PULSE, R.id.item_VSD, R.id.item_TEMPERATURE_INNER,R.id.item_PARAM_TEMP, R.id.item_PARAM_DAMPER, R.id.item_PARAM_TEMP_LIMIT},
+                        new String[]{"_id", "NAME", "DESCRIPTION", "TIME_VALUE", "TEMPERATURE", "PRESSURE", "SPIROGRAM", "PNEVMOGRAM",  "PULSE", "VSD","TEMPERATURE_INNER", "PARAM_TEMP", "PARAM_DAMPER", "PARAM_TEMP_LIMIT"},
+                        new int[]{R.id.item_ID, R.id.item_NAME, R.id.item_DESCRIPTION, R.id.item_TIME_VALUE, R.id.item_TEMPERATURE, R.id.item_PRESSURE, R.id.item_SPIROGRAM,R.id.item_PNEVMOGRAM, R.id.item_PULSE, R.id.item_VSD, R.id.item_TEMPERATURE_INNER,R.id.item_PARAM_TEMP, R.id.item_PARAM_DAMPER, R.id.item_PARAM_TEMP_LIMIT},
                         0);
 
 
