@@ -57,11 +57,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     }
-    public void clear(){
-        SQLiteDatabase db2 = this.getReadableDatabase();
-        db2.delete("TRAINING", null, null);
-        db2.close();
-    }
 
     private void updateMyDatabase(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 1) {

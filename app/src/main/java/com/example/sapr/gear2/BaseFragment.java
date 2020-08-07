@@ -36,6 +36,8 @@ import com.opencsv.CSVWriter;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -68,10 +70,12 @@ public class BaseFragment extends Fragment {
         layout = inflater.inflate(R.layout.fragment_base, container, false);
         search = (Button) layout.findViewById(R.id.Search_DB);
         savecsv = (Button) layout.findViewById(R.id.SaveDB);
-        deldb = (Button) layout.findViewById(R.id.SaveDB);
+
         username = (EditText) layout.findViewById(R.id.user_filter);
         description = (EditText) layout.findViewById(R.id.decription_filter);
         listData = (ListView) layout.findViewById(R.id.list_data);
+        View headerView = inflater.inflate(R.layout.header_item, listData, false);
+        listData.addHeaderView(headerView, null, false);
 
         new UpdateBaseTask().execute();
 
@@ -81,18 +85,14 @@ public class BaseFragment extends Fragment {
                 new UpdateBaseTask().execute();
             }
         });
-        deldb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dh.clear();
-            }
-        });
+
         savecsv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (selfPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE))
                 exportDB();
-                else Log.e("DB","error write file permission");
+                else ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 6854);
             }
         });
 
@@ -140,8 +140,9 @@ public class BaseFragment extends Fragment {
         {
             exportDir.mkdirs();
         }
-
-        File file = new File(exportDir, "csvname.csv");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+        Date date = new Date();
+        File file = new File(exportDir, "csvname"+dateFormat.format(date)+".csv");
         try
         {
             file.createNewFile();
@@ -160,6 +161,9 @@ public class BaseFragment extends Fragment {
             }
             csvWrite.close();
             curCSV.close();
+            Toast toast =Toast.makeText(getActivity().getApplicationContext(),
+                    "Сохранено", Toast.LENGTH_SHORT);
+            toast.show();
         }
         catch(Exception sqlEx)
         {
@@ -205,7 +209,7 @@ public class BaseFragment extends Fragment {
                         R.layout.data_item,
                         cursor,
                         new String[]{"_id", "NAME", "DESCRIPTION", "TIME_VALUE", "TEMPERATURE", "PRESSURE", "SPIROGRAM",  "PULSE", "VSD","TEMPERATURE_INNER", "PARAM_TEMP", "PARAM_DAMPER", "PARAM_TEMP_LIMIT"},
-                        new int[]{R.id.item_ID, R.id.item_NAME, R.id.item_DESCRIPTION, R.id.item_TIME_VALUE, R.id.item_TEMPERATURE, R.id.item_VSD, R.id.item_PULSE, R.id.item_TEMPERATURE_INNER,R.id.item_PARAM_TEMP, R.id.item_PARAM_DAMPER, R.id.item_PARAM_TEMP_LIMIT},
+                        new int[]{R.id.item_ID, R.id.item_NAME, R.id.item_DESCRIPTION, R.id.item_TIME_VALUE, R.id.item_TEMPERATURE, R.id.item_PRESSURE, R.id.item_SPIROGRAM, R.id.item_PULSE, R.id.item_VSD, R.id.item_TEMPERATURE_INNER,R.id.item_PARAM_TEMP, R.id.item_PARAM_DAMPER, R.id.item_PARAM_TEMP_LIMIT},
                         0);
 
 

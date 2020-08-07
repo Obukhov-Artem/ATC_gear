@@ -32,131 +32,14 @@
             android:id="@+id/Search_DB"
             android:text="Поиск"/>
         <Button
-            android:id="@+id/delDB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Очистить"
-            android:textSize="10sp" />
-        <Button
             android:id="@+id/SaveDB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Импорт"
-            android:textSize="20sp" />
+            android:text="Экспорт"  />
 
     </LinearLayout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal" android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/item_ID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"
-            android:text="Ид                  " />
-        <TextView
-            android:id="@+id/item_NAME"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Пользователь  " />
-
-        <TextView
-            android:id="@+id/item_DESCRIPTION"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Комментарий                " />
-        <TextView
-            android:id="@+id/item_TIME_VALUE"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Время                                           " />
-        <TextView
-            android:id="@+id/item_TEMPERATURE"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Темп." />
-        <TextView
-            android:id="@+id/item_PRESSURE"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Давл." />
-        <TextView
-            android:id="@+id/item_SPIROGRAM"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Спирогр." />
-        <TextView
-            android:id="@+id/item_VSD"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="ВЗД" />
-        <TextView
-            android:id="@+id/item_PULSE"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Пульс" />
-        <TextView
-            android:id="@+id/item_TEMPERATURE_INNER"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Вн.Т." />
-        <TextView
-            android:id="@+id/item_PARAM_TEMP"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Нагрев" />
-        <TextView
-            android:id="@+id/item_PARAM_DAMPER"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Заслонка" />
-
-        <TextView
-            android:id="@+id/item_PARAM_TEMP_LIMIT"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Т.лимит" />
-    </LinearLayout>
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

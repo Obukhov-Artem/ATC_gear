@@ -1,115 +1,113 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+
     android:weightSum="100">
 
     <TextView
-        android:id="@+id/item_ID"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/item_IDh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
+        android:layout_width="wrap_content"
         android:layout_weight="5"
-        android:text="-" />
+        android:layout_height="wrap_content"
+        android:text="Ид" />
     <TextView
-        android:id="@+id/item_NAME"
+        android:id="@+id/item_NAMEh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
         android:layout_weight="10"
         android:layout_height="wrap_content"
-        android:text="-" />
+        android:text="Пользователь  " />
 
     <TextView
-        android:id="@+id/item_DESCRIPTION"
+        android:id="@+id/item_DESCRIPTIONh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_weight="10"
-        android:text="-" />
+        android:layout_height="wrap_content"
+        android:text="Комментарий" />
     <TextView
-        android:id="@+id/item_TIME_VALUE"
+        android:id="@+id/item_TIME_VALUEh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
         android:layout_weight="5"
         android:layout_height="wrap_content"
-        android:text="-" />
+        android:text="Время  " />
     <TextView
-        android:id="@+id/item_TEMPERATURE"
+        android:id="@+id/item_TEMPERATUREh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
         android:layout_weight="5"
         android:layout_height="wrap_content"
-        android:text="-" />
+        android:text="Темп." />
     <TextView
-        android:id="@+id/item_PRESSURE"
+        android:id="@+id/item_PRESSUREh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
         android:layout_weight="5"
         android:layout_height="wrap_content"
-        android:text="-" />
+        android:text="Давл." />
     <TextView
-        android:id="@+id/item_SPIROGRAM"
+        android:id="@+id/item_SPIROGRAMh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
         android:layout_weight="5"
         android:layout_height="wrap_content"
-        android:text="-" />
+        android:text="Спирогр." />
     <TextView
-        android:id="@+id/item_VSD"
+        android:id="@+id/item_VSDh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
         android:layout_weight="5"
         android:layout_height="wrap_content"
-    android:text="-" />
+        android:text="ВЗД" />
     <TextView
-        android:id="@+id/item_PULSE"
+        android:id="@+id/item_PULSEh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
         android:layout_weight="5"
         android:layout_height="wrap_content"
-    android:text="-" />
+        android:text="Пульс" />
     <TextView
-        android:id="@+id/item_TEMPERATURE_INNER"
+        android:id="@+id/item_TEMPERATURE_INNERh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
         android:layout_weight="5"
         android:layout_height="wrap_content"
-        android:text="-" />
+        android:text="Вн.Т." />
     <TextView
-        android:id="@+id/item_PARAM_TEMP"
+        android:id="@+id/item_PARAM_TEMPh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_width="wrap_content"
         android:layout_weight="5"
         android:layout_height="wrap_content"
-        android:text="-" />
+        android:text="Нагрев" />
     <TextView
-        android:id="@+id/item_PARAM_DAMPER"
+        android:id="@+id/item_PARAM_DAMPERh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
+        android:layout_width="wrap_content"
+        android:layout_weight="5"
+        android:layout_height="wrap_content"
+        android:text="Заслонка" />
 
-        android:layout_width="wrap_content"
-        android:layout_weight="5"
-        android:layout_height="wrap_content"
-        android:text="-" />
-
     <TextView
-        android:id="@+id/item_PARAM_TEMP_LIMIT"
+        android:id="@+id/item_PARAM_TEMP_LIMITh"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-
         android:layout_width="wrap_content"
         android:layout_weight="5"
         android:layout_height="wrap_content"
-        android:text="-" />
+        android:text="Т.лимит" />
 </LinearLayout>

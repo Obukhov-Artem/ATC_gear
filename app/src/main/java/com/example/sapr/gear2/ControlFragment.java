@@ -718,7 +718,7 @@ public class ControlFragment extends Fragment implements SensorEventListener {
                 if (flagDB.isChecked()) {
                     db = dh.getWritableDatabase();
                     dh.insertData(db, String.valueOf(username.getText()), String.valueOf(decription.getText()),
-                            temperature, pressure, vsd,
+                            temperature, (float)pressure, (float)vsd,
                             mHeartRate,inner_temp, param_temp,param_damp, im_temp_max, spirogram);
                     db.close();
                     dh.close();
